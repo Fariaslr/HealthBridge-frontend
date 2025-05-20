@@ -1,21 +1,30 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
+import type { Pessoa } from "../models/Pessoa";
 
-type Usuario = {
-  id: string;
-  nome: string;
-  email: string;
-  // outros campos conforme seu backend
-}; 
 type AuthContextType = {
-  usuario: Usuario | null;
-  setUsuario: (user: Usuario | null) => void;
+  usuario: Pessoa | null;
+  setUsuario: (user: Pessoa | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  // Inicializa o estado lendo do localStorage
+  const [usuario, setUsuarioState] = useState<Pessoa | null>(() => {
+    const storedUser = localStorage.getItem("usuario");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  // Função para atualizar estado + salvar no localStorage
+  const setUsuario = (user: Pessoa | null) => {
+    if (user) {
+      localStorage.setItem("usuario", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("usuario");
+    }
+    setUsuarioState(user);
+  };
 
   return (
     <AuthContext.Provider value={{ usuario, setUsuario }}>
@@ -29,3 +38,4 @@ export const useAuth = () => {
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
+''

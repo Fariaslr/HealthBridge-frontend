@@ -1,10 +1,9 @@
-export interface LoginResponse {
-  id: string;
-  nome: string;
-  email: string;
-}
+import axios from "axios";
+import type { Pessoa } from "../models/Pessoa";
 
-export async function login(email: string, senha: string): Promise<LoginResponse> {
+
+
+export async function login(email: string, senha: string): Promise<Pessoa> {
   const response = await fetch("http://localhost:8080/auth/login", {
     method: "POST",
     headers: {
@@ -18,4 +17,10 @@ export async function login(email: string, senha: string): Promise<LoginResponse
   }
 
   return response.json();
+}
+
+
+export async function cadastrar(dados: any) {
+  const response = await axios.post("http://localhost:8080/pessoas", dados);
+  return response.data;
 }

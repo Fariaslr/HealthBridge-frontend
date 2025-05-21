@@ -1,16 +1,51 @@
-import { useAuth } from "../context/AuthContext"
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Home () {
-    const  pessoa  = useAuth();
-    return (
-      <div>
-      <h1>Bem-vindo à Página Principal</h1>
-      <h2>Dados da Pessoa Logada:</h2>
-      {pessoa? (
-        <pre>{JSON.stringify(pessoa, null, 2)}</pre>
-      ) : (
-        <p>Nenhum usuário logado.</p>
-      )}
+export default function Home() {
+  const { usuario, setUsuario } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setUsuario(null);
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  if (!usuario) {
+    return <p>Carregando ou usuário não logado...</p>;
+  }
+
+  return (
+    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+      <h1>Bem-vindo, {usuario.nome}!</h1>
+
+      <section style={{ marginTop: "2rem", background: "black", padding: "1rem", borderRadius: "8px" }}>
+        <h2>Seus Dados</h2>
+        <p><strong>Email:</strong> {usuario.email}</p>
+        <p><strong>CPF:</strong> {usuario.cpf}</p>
+      </section>
+
+      <section style={{ marginTop: "2rem" }}>
+        <h2>Ações rápidas</h2>
+        <button onClick={() => navigate("/Perfil")} style={btnStyle}>Editar Perfil</button>
+        <button onClick={() => navigate("/Plano")} style={btnStyle}>Ver Planos</button>
+        <button onClick={() => navigate("/Consultas")} style={btnStyle}>Próximas Consultas</button>
+      </section>
+
+      <button onClick={handleLogout} style={{ ...btnStyle, backgroundColor: "#c0392b", marginTop: "2rem" }}>
+        Sair
+      </button>
     </div>
-    )
+  );
 }
+
+const btnStyle = {
+  padding: "0.5rem 1rem",
+  marginRight: "1rem",
+  marginTop: "0.5rem",
+  border: "none",
+  backgroundColor: "#3498db",
+  color: "white",
+  borderRadius: "5px",
+  cursor: "pointer"
+};

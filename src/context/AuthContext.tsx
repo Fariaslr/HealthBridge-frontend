@@ -10,7 +10,6 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Inicializa o estado lendo do localStorage
   const [usuario, setUsuarioState] = useState<Pessoa | null>(() => {
     const storedUser = localStorage.getItem("usuario");
     return storedUser ? JSON.parse(storedUser) : null;

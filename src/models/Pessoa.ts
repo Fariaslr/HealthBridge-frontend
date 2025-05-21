@@ -3,6 +3,7 @@ export type Sexo = "MASCULINO" | "FEMININO" | "OUTRO"; // baseado no seu Enum em
 export type Endereco = {
   cep: string;
   complemento: string;
+  numero: number;
 };
 
 export type Pessoa = {

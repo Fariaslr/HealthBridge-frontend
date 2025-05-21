@@ -19,14 +19,7 @@ export default function Home() {
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>Bem-vindo, {usuario.nome}!</h1>
 
-      <section style={{ marginTop: "2rem", background: "black", padding: "1rem", borderRadius: "8px" }}>
-        <h2>Seus Dados</h2>
-        <p><strong>Email:</strong> {usuario.email}</p>
-        <p><strong>CPF:</strong> {usuario.cpf}</p>
-      </section>
-
       <section style={{ marginTop: "2rem" }}>
-        <h2>Ações rápidas</h2>
         <button onClick={() => navigate("/Perfil")} style={btnStyle}>Editar Perfil</button>
         <button onClick={() => navigate("/Plano")} style={btnStyle}>Ver Planos</button>
         <button onClick={() => navigate("/Consultas")} style={btnStyle}>Próximas Consultas</button>

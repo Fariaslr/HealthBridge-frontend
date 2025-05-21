@@ -5,17 +5,38 @@ import Login from "./pages/Login";
 import Consultas from "./pages/Consultas";
 import Plano from "./pages/Plano";
 import Perfil from "./pages/Perfil";
+import { useAuth } from "./context/AuthContext";
+import Layout from "./components/Layout"; // importe o Layout que você criou
+import type { JSX } from "react";
+
+function PrivateRoute({ children }: { children: JSX.Element }) {
+  const { usuario } = useAuth();
+  return usuario ? children : <Navigate to="/login" />;
+}
 
 function App() {
   return (
-    <BrowserRouter>
-       <Routes>
+    <BrowserRouter basename="/macros-frontend">
+      <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/Consultas" element={<Consultas />} />
-        <Route path="/Plano" element={<Plano />} />
-        <Route path="/Perfil" element={<Perfil />} />
+
+        {/* Rotas com Header e Layout */}
+        <Route
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          {/* Aqui vão as rotas que estarão dentro do Layout */}
+          <Route path="/home" element={<Home />} />
+          <Route path="/consultas" element={<Consultas />} />
+          <Route path="/plano" element={<Plano />} />
+          <Route path="/perfil" element={<Perfil />} />
+        </Route>
+
+        {/* Rota coringa */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

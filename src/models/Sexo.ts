@@ -1,0 +1,1 @@
+export type Sexo = "MASCULINO" | "FEMININO" | "OUTRO";

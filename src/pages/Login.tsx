@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import type { Pessoa } from "../models/Pessoa";
+import { login } from "../services/authService";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,6 +18,7 @@ export default function Login() {
       setUsuario(user);
       setErro("");
       navigate("/home"); // redireciona para a home após login
+      console.log(user.tipoUsuario)
     } catch (err: any) {
       setErro(err.message || "Erro ao fazer login");
     }

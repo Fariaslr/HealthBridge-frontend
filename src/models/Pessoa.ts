@@ -1,10 +1,5 @@
-export type Sexo = "MASCULINO" | "FEMININO" | "OUTRO"; // baseado no seu Enum em Java
-
-export type Endereco = {
-  cep: string;
-  complemento: string;
-  numero: number;
-};
+import type { Endereco } from "./Endereco";
+import type { Sexo } from "./Sexo";
 
 export type Pessoa = {
   id: string;
@@ -14,8 +9,8 @@ export type Pessoa = {
   telefone: string;
   usuario: string;
   email: string;
-  senha?: string; // opcional para evitar expor desnecessariamente
   dataNascimento: string; // será uma string ISO ao vir do backend
   sexo: Sexo;
+  tipoUsuario: string;
   endereco: Endereco;
 };

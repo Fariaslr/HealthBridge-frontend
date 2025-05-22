@@ -1,0 +1,6 @@
+export type NivelAtividadeFisica =
+  | "SEDENTARIO"
+  | "LEVEMENTE_ATIVO"
+  | "MODERADAMENTE_ATIVO"
+  | "ALTAMENTE_ATIVO"
+  | "EXTREMAMENTE_ATIVO";

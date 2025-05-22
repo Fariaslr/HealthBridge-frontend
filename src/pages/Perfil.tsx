@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import ModalEdicao from "../components/ModalEdicao";
+import ModalEdicao from "../components/ModalPerfil";
 
 export default function Perfil() {
   const { usuario, setUsuario } = useAuth(); // garantir que você pode setar
@@ -66,10 +66,11 @@ export default function Perfil() {
         {renderItem("Telefone", "telefone")}
         {renderItem("Sexo", "sexo")}
         {renderItem("Data de Nascimento", "dataNascimento")}
-        {renderItem("Endereço - CEP", "endereco.cep")}
-        {renderItem("Endereço - Número", "endereco.numero")}
-        {renderItem("Endereço - Complemento", "endereco.complemento")}
-
+        {renderItem("CEP", "endereco.cep")}
+        {renderItem("Número", "endereco.numero")}
+        {renderItem("Complemento", "endereco.complemento")}
+        {renderItem("Tipo de Usuário", "tipoUsuario")}
+        
         {campoSelecionado && (
           <ModalEdicao
             campo={campoSelecionado}

@@ -22,7 +22,7 @@ export default function Home() {
       <section style={{ marginTop: "2rem" }}>
         <button onClick={() => navigate("/Perfil")} style={btnStyle}>Editar Perfil</button>
         <button onClick={() => navigate("/Plano")} style={btnStyle}>Ver Planos</button>
-        <button onClick={() => navigate("/Consultas")} style={btnStyle}>Próximas Consultas</button>
+        <button onClick={() => navigate("/Consultas")} style={btnStyle}>Ver Consultas</button>
       </section>
 
       <button onClick={handleLogout} style={{ ...btnStyle, backgroundColor: "#c0392b", marginTop: "2rem" }}>

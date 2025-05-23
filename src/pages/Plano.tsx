@@ -55,11 +55,13 @@ export default function PlanoPage() {
 
     try {
       const planoCriado = await criarPlano({
-        paciente: usuario.id,
+        pacienteId: usuario.id,
         objetivo: novoPlano.objetivo,
         nivelAtividadeFisica: novoPlano.nivelAtividadeFisica,
-        profissionalSaude: "id-profissional-teste",
+        profissionalSaudeId: "cb660dd7-11b2-4283-a127-e939bd01f74e",
       });
+
+      console.log()
 
       setPlano(planoCriado);
       alert("Plano criado com sucesso!");
@@ -68,6 +70,8 @@ export default function PlanoPage() {
     } catch (error: any) {
       console.error("Erro ao criar plano:", error);
       alert(error?.message || "Erro ao criar plano");
+    } finally {
+      setCriando(false); 
     }
 
   };

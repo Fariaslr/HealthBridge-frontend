@@ -4,10 +4,10 @@ import type { Plano } from "../models/Plano";
 const API_BASE = "http://localhost:8080"; 
 
 export type PlanoRecordDto = {
-  paciente: string;
+  pacienteId: string;
   objetivo: string;
   nivelAtividadeFisica: string; 
-  profissionalSaude: string;
+  profissionalSaudeId: string;
 };
 
 export async function listarPlanos(): Promise<Plano[]> {

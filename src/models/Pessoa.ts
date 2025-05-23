@@ -1,4 +1,5 @@
 import type { Endereco } from "./Endereco";
+import type { Plano } from "./Plano";
 import type { Sexo } from "./Sexo";
 
 export type Pessoa = {
@@ -13,4 +14,5 @@ export type Pessoa = {
   sexo: Sexo;
   tipoUsuario: string;
   endereco: Endereco;
+  plano: Plano;
 };

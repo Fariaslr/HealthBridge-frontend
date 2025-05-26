@@ -1,12 +1,12 @@
-import axios from "axios"; // Paciente e ProfissionalSaude estendem Pessoa
+import axios from "axios";
 import type { Plano } from "../models/Plano";
 
-const API_BASE = "http://localhost:8080"; 
+const API_BASE = "http://localhost:8080";
 
 export type PlanoRecordDto = {
   pacienteId: string;
   objetivo: string;
-  nivelAtividadeFisica: string; 
+  nivelAtividadeFisica: string;
   profissionalSaudeId: string;
 };
 
@@ -39,10 +39,16 @@ export async function buscarPlanosPorProfissional(profissionalId: string): Promi
   return response.data;
 }
 
+
 export async function buscarPlanoPorPacienteId(pacienteId: string): Promise<Plano> {
-  const response = await fetch(`/planos/paciente/${pacienteId}`);
-  if (!response.ok) {
-    throw new Error("Erro ao buscar plano");
+  try {
+    const response = await axios.get<Plano>(`${API_BASE}/planos/paciente/${pacienteId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || `Erro ao buscar plano: Status ${error.response.status}`);
+    } else {
+      throw new Error("Erro ao buscar plano: " + (error as Error).message);
+    }
   }
-  return response.json();
 }

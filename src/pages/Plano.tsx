@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import type { Plano } from "../models/Plano";
-import { buscarPlanoPorPacienteId, criarPlano } from "../services/planoService"; // importe o modal criado acima
+import { buscarPlanoPorPacienteId, criarPlano } from "../services/planoService";
 import { Modal } from "../components/ModalPlano";
 
 export default function PlanoPage() {
@@ -22,12 +22,12 @@ export default function PlanoPage() {
         setLoading(false);
         return;
       }
-
       try {
         const planoData = await buscarPlanoPorPacienteId(usuario.id);
         setPlano(planoData);
       } catch (error) {
         console.error("Erro ao carregar plano:", error);
+        setPlano(null);
       } finally {
         setLoading(false);
       }
@@ -61,7 +61,7 @@ export default function PlanoPage() {
         profissionalSaudeId: "cb660dd7-11b2-4283-a127-e939bd01f74e",
       });
 
-      console.log()
+      console.log("Plano criado:", planoCriado);
 
       setPlano(planoCriado);
       alert("Plano criado com sucesso!");
@@ -71,9 +71,8 @@ export default function PlanoPage() {
       console.error("Erro ao criar plano:", error);
       alert(error?.message || "Erro ao criar plano");
     } finally {
-      setCriando(false); 
+      setCriando(false);
     }
-
   };
 
   if (loading) return <p>Carregando plano...</p>;
@@ -87,9 +86,6 @@ export default function PlanoPage() {
           <p><strong>Nível de Atividade Física:</strong> {plano.nivelAtividadeFisica}</p>
           <p><strong>Profissional:</strong> {plano.profissionalSaude.nome}</p>
           <p><strong>Data do Plano:</strong> {new Date(plano.dataPlano).toLocaleDateString()}</p>
-          <button onClick={abrirModal} style={{ marginTop: "1rem" }}>
-            Criar Novo Plano
-          </button>
         </>
       ) : (
         <>

@@ -4,10 +4,11 @@ import type { Pessoa } from "./Pessoa";
 
 export type Plano = {
   id: string;
-  paciente: Pessoa; // referência circular
-  dataPlano: string; // formato ISO vindo do backend
+  paciente: Pessoa;
   objetivo: Objetivo;
-  nivelAtividadeFisica: NivelAtividadeFisica ;
+  nivelAtividadeFisica: NivelAtividadeFisica;
   profissionalSaude: Pessoa;
-  //consultas: Consulta[];
+  dataCriacao: string;
+  dataAtualizacao: string;
+  //consultas : Consulta[]
 };

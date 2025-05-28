@@ -1,3 +1,4 @@
+// src/pages/Perfil.tsx
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import ModalEdicao from "../components/ModalPerfil";
@@ -57,10 +58,10 @@ export default function Perfil() {
   };
 
   const renderItem = (label: string, campo: string) => (
-    <div className={styles.infoItem}> {/* Usando className */}
-      <span className={styles.label}>{label}:</span> {/* Usando className */}
-      <span className={styles.value}>{obterValorAtual(campo)}</span> {/* Usando className */}
-      <button onClick={() => abrirModal(campo)} className={styles.editIcon}> {/* Usando className */}
+    <div className={styles.infoItem}>
+      <span className={styles.label}>{label}:</span>
+      <span className={styles.value}>{obterValorAtual(campo)}</span>
+      <button onClick={() => abrirModal(campo)} className={styles.editIcon}>
         ✏️
       </button>
     </div>

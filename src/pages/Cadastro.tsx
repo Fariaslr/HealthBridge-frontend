@@ -1,76 +1,159 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { cadastrar } from "../services/authService";
+import { cadastrarUsuario } from "../services/authService";
+import type { PessoaBaseInput, TipoCadastro } from "../types/cadastroTypes";
+
+
+const initialSimplifiedState: PessoaBaseInput = {
+  nome: "",
+  sobrenome: "SobrenomeTeste",
+  email: "",
+  senha: "",
+  telefone: "99999999999",
+  cpf: "11122233344",
+  dataNascimento: "2000-01-01", // Formato YYYY-MM-DD
+  sexo: "NAO_INFORMADO", // Ou "MASCULINO", "FEMININO"
+  cep: "12345-678",
+  numero: "123",
+  complemento: "Apto 101",
+};
 
 export default function Cadastro() {
-  const [nome, setNome] = useState("");
-  const [sobrenome, setSobrenome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
   const navigate = useNavigate();
+
+  const [tipoCadastro, setTipoCadastro] = useState<TipoCadastro>("PACIENTE");
+  const [formData, setFormData] = useState<
+    PessoaBaseInput & { cref?: string; crn?: string }
+  >(initialSimplifiedState);
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTipoCadastroChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newType = e.target.value as TipoCadastro;
+    setTipoCadastro(newType);
+    setFormData(initialSimplifiedState); // Reinicia com os valores padrão simplificados
+    setErro("");
+  };
 
   const handleCadastro = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setErro("");
+
     try {
-      await cadastrar({
-        nome,
-        sobrenome,
-        email,
-        senha,
-        dataNascimento: "2001-01-01", // Pode ajustar conforme seu modelo
-        sexo: "MASCULINO", // Pode ajustar conforme seu modelo
-      });
-      setErro("");
+      if (!formData.nome.trim()) {
+        throw new Error("O nome é obrigatório.");
+      }
+      if (!formData.email.trim()) {
+        throw new Error("O email é obrigatório.");
+      }
+      if (!formData.senha.trim()) {
+        throw new Error("A senha é obrigatória.");
+      }
+
+      if (tipoCadastro === "EDUCADOR_FISICO" && !formData.cref?.trim()) {
+        throw new Error("O CREF é obrigatório para Educador Físico.");
+      }
+      if (tipoCadastro === "NUTRICIONISTA" && !formData.crn?.trim()) {
+        throw new Error("O CRN é obrigatório para Nutricionista.");
+      }
+
+      await cadastrarUsuario(tipoCadastro, formData);
+
       alert("Cadastro realizado com sucesso!");
-      navigate("/login"); // volta para login após cadastro
+      navigate("/login");
     } catch (err: any) {
+      console.error("Erro no cadastro:", err);
       setErro(err.message || "Erro ao cadastrar");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div style={containerStyle}>
       <form onSubmit={handleCadastro} style={formStyle} autoComplete="off">
-        <h2 style={titleStyle}>Cadastro</h2>
+        <h2 style={titleStyle}>Cadastro Simplificado</h2>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="tipoCadastro">Sou um(a):</label>
+          <select
+            id="tipoCadastro"
+            value={tipoCadastro}
+            onChange={handleTipoCadastroChange}
+            style={{ ...inputStyle, marginLeft: 10, width: "auto" }}
+          >
+            <option value="PACIENTE">Paciente</option>
+            <option value="EDUCADOR_FISICO">Educador Físico</option>
+            <option value="NUTRICIONISTA">Nutricionista</option>
+          </select>
+        </div>
+
         <input
           type="text"
           placeholder="Nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-          style={inputStyle}
-        />
-        <input
-          type="text"
-          placeholder="Sobrenome"
-          value={sobrenome}
-          onChange={(e) => setSobrenome(e.target.value)}
+          name="nome"
+          value={formData.nome}
+          onChange={handleChange}
           required
           style={inputStyle}
         />
         <input
           type="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
           required
           style={inputStyle}
           autoComplete="new-email"
         />
-
         <input
           type="password"
           placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          name="senha"
+          value={formData.senha}
+          onChange={handleChange}
           required
           style={inputStyle}
           autoComplete="new-password"
         />
 
-        <button type="submit" style={buttonStyle}>
-          Cadastrar
+        {tipoCadastro === "EDUCADOR_FISICO" && (
+          <input
+            type="text"
+            placeholder="CREF"
+            name="cref"
+            value={formData.cref || ""}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        )}
+
+        {tipoCadastro === "NUTRICIONISTA" && (
+          <input
+            type="text"
+            placeholder="CRN"
+            name="crn"
+            value={formData.crn || ""}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+        )}
+
+        <button type="submit" style={buttonStyle} disabled={loading}>
+          {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
         {erro && <p style={errorStyle}>{erro}</p>}
         <p style={signupTextStyle}>
@@ -84,7 +167,6 @@ export default function Cadastro() {
   );
 }
 
-// Mesmos estilos do Login para manter padrão
 const containerStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",

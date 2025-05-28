@@ -10,7 +10,7 @@ export type Pessoa = {
   telefone: string;
   usuario: string;
   email: string;
-  dataNascimento: string; // será uma string ISO ao vir do backend
+  dataNascimento: string;
   sexo: Sexo;
   tipoUsuario: string;
   endereco: Endereco;

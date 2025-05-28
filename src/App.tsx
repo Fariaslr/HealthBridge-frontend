@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Cadastro from "./pages/Cadastro";
 import Login from "./pages/Login";
-import Consultas from "./pages/Consultas";
-import Plano from "./pages/Plano";
+import Consultas from "./pages/ConsultaPage.tsx";
+import Plano from "./pages/PlanoPage.tsx";
 import Perfil from "./pages/Perfil";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout"; // importe o Layout que você criou

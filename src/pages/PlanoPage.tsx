@@ -1,104 +1,123 @@
-// src/pages/Perfil.tsx
-import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import ModalEdicao from "../components/ModalPerfil";
-import styles from "./Perfil.module.css"; // Importe os estilos
+import { useAuth } from "../context/AuthContext";
+import { criarPlano } from "../services/planoService";
+import { Modal } from "../components/ModalPlano";
 
-export default function Perfil() {
-  const { usuario, setUsuario } = useAuth();
-  const [campoSelecionado, setCampoSelecionado] = useState<string | null>(null);
+export default function PlanoPage() {
+  const { usuario, planoUsuario, carregarPlanoUsuario } = useAuth();
+
+  const [modalAberto, setModalAberto] = useState(false);
+  const [novoPlano, setNovoPlano] = useState({
+    objetivo: "",
+    nivelAtividadeFisica: "",
+  });
+  const [criando, setCriando] = useState(false);
+
+  const abrirModal = () => setModalAberto(true);
+  const fecharModal = () => setModalAberto(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNovoPlano((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCriarPlano = async () => {
+    if (!usuario) return alert("Usuário não autenticado");
+
+    if (!novoPlano.objetivo || !novoPlano.nivelAtividadeFisica) {
+      return alert("Preencha todos os campos");
+    }
+
+    setCriando(true);
+
+    try {
+      const planoCriado = await criarPlano({
+        pacienteId: usuario.id,
+        objetivo: novoPlano.objetivo,
+        nivelAtividadeFisica: novoPlano.nivelAtividadeFisica,
+        profissionalSaudeId: "cb660dd7-11b2-4283-a127-e939bd01f74e",
+      });
+
+      console.log("Plano criado:", planoCriado);
+
+      await carregarPlanoUsuario();
+      alert("Plano criado com sucesso!");
+      setNovoPlano({ objetivo: "", nivelAtividadeFisica: "" });
+      fecharModal();
+    } catch (error: any) {
+      console.error("Erro ao criar plano:", error);
+      alert(error?.message || "Erro ao criar plano");
+    } finally {
+      setCriando(false);
+    }
+  };
 
   if (!usuario) {
-    return (
-      <div className={styles.loadingContainer}>
-        <p className={styles.loadingText}>Carregando perfil ou usuário não autenticado.</p>
-      </div>
-    );
+    return <p>Por favor, faça login para ver seu plano.</p>;
   }
 
-  const abrirModal = (campo: string) => {
-    setCampoSelecionado(campo);
-  };
+  if (planoUsuario === null && !criando) {
+    return <p>Carregando plano...</p>;
+  }
 
-  const fecharModal = () => {
-    setCampoSelecionado(null);
-  };
-
-  const obterValorAtual = (campo: string): string | number => {
-    const partes = campo.split(".");
-    let valor: any = usuario;
-
-    for (const parte of partes) {
-      if (valor === null || valor === undefined) return "N/A";
-      valor = valor[parte];
-    }
-
-    if (campo.includes("dataNascimento") && valor) {
-      try {
-        return new Date(valor).toLocaleDateString('pt-BR');
-      } catch (e) {
-        return valor;
-      }
-    }
-    return valor || "N/A";
-  };
-
-  const salvarValor = (campo: string, novoValor: string | number) => {
-    const partes = campo.split(".");
-    const novoUsuario = { ...usuario };
-
-    let alvo: any = novoUsuario;
-    for (let i = 0; i < partes.length - 1; i++) {
-      alvo = alvo[partes[i]];
-    }
-
-    alvo[partes[partes.length - 1]] = novoValor;
-    setUsuario(novoUsuario);
-    fecharModal();
-  };
-
-  const renderItem = (label: string, campo: string) => (
-    <div className={styles.infoItem}>
-      <span className={styles.label}>{label}:</span>
-      <span className={styles.value}>{obterValorAtual(campo)}</span>
-      <button onClick={() => abrirModal(campo)} className={styles.editIcon}>
-        ✏️
-      </button>
-    </div>
-  );
+  const plano = planoUsuario;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.profileCard}>
-        <h2 className={styles.title}>Meu Perfil</h2>
+    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
+      {plano ? (
+        <>
+          <h2>Plano de {plano.paciente.nome}</h2>
+          <p><strong>Objetivo:</strong> {plano.objetivo}</p>
+          <p><strong>Nível de Atividade Física:</strong> {plano.nivelAtividadeFisica}</p>
+          <p><strong>Profissional:</strong> {plano.profissionalSaude.nome}</p>
+          <p><strong>Criado em:</strong> {new Date(plano.dataCriacao).toLocaleDateString()} {new Date(plano.dataCriacao).toLocaleTimeString()}</p>
+          <p><strong>Última Atualização:</strong> {new Date(plano.dataAtualizacao).toLocaleDateString()} {new Date(plano.dataAtualizacao).toLocaleTimeString()}</p>
+        </>
+      ) : (
+        <>
+          <p>Nenhum plano encontrado para o usuário.</p>
+          <button onClick={abrirModal}>Criar Novo Plano</button>
+        </>
+      )}
 
-        <div className={styles.infoGroup}>
-          {renderItem("Nome Completo", "nome")}
-          {renderItem("Sobrenome", "sobrenome")}
-          {renderItem("Email", "email")}
-          {renderItem("CPF", "cpf")}
-          {renderItem("Telefone", "telefone")}
-          {renderItem("Gênero", "sexo")}
-          {renderItem("Data de Nascimento", "dataNascimento")}
-          {renderItem("Tipo de Usuário", "tipoUsuario")}
-        </div>
-
-        <h3 className={styles.sectionTitle}>Endereço</h3>
-        <div className={styles.infoGroup}>
-          {renderItem("CEP", "endereco.cep")}
-          {renderItem("Número", "endereco.numero")}
-          {renderItem("Complemento", "endereco.complemento")}
-        </div>
-
-        {campoSelecionado && (
-          <ModalEdicao
-            campo={campoSelecionado}
-            valor={obterValorAtual(campoSelecionado)}
-            onClose={fecharModal}
-            onSalvar={salvarValor}
-          />
-        )}
-      </div>
+      <Modal isOpen={modalAberto} onClose={fecharModal}>
+        <h3>Criar novo plano</h3>
+        <label>
+          Objetivo:
+          <select
+            name="objetivo"
+            value={novoPlano.objetivo}
+            onChange={handleChange}
+            style={{ marginLeft: 10 }}
+          >
+            <option value="">Selecione</option>
+            <option value="EMAGRECIMENTO">Emagrecimento</option>
+            <option value="MANUTENCAO">Manutenção do peso</option>
+            <option value="HIPERTROFIA">Hipertrofia</option>
+          </select>
+        </label>
+        <br />
+        <label>
+          Nível de Atividade Física:
+          <select
+            name="nivelAtividadeFisica"
+            value={novoPlano.nivelAtividadeFisica}
+            onChange={handleChange}
+            style={{ marginLeft: 10 }}
+          >
+            <option value="">Selecione</option>
+            <option value="SEDENTARIO">Sedentário</option>
+            <option value="LEVEMENTE_ATIVO">Levemente ativo</option>
+            <option value="MODERADAMENTE_ATIVO">Moderadamente ativo</option>
+            <option value="ALTAMENTE_ATIVO">Altamente ativo</option>
+            <option value="EXTREMAMENTE_ATIVO">Extremamente ativo</option>
+          </select>
+        </label>
+        <br />
+        <button onClick={handleCriarPlano} disabled={criando} style={{ marginTop: "1rem" }}>
+          {criando ? "Criando..." : "Criar Plano"}
+        </button>
+      </Modal>
     </div>
   );
 }

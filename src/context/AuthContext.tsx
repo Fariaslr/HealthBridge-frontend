@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useRef } from "react"; // Importe useRef
 import type { ReactNode } from "react";
 import type { Pessoa } from "../models/Pessoa";
 import type { Plano } from "../models/Plano";
@@ -9,17 +9,33 @@ type AuthContextType = {
   setUsuario: (user: Pessoa | null) => void;
   planoUsuario: Plano | null;
   carregarPlanoUsuario: () => Promise<void>;
+  isAuthenticated: boolean;
+  isAuthReady: boolean; // <--- NOVO: Indica se o estado de autenticação já foi determinado
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [usuario, setUsuarioState] = useState<Pessoa | null>(() => {
-    const storedUser = localStorage.getItem("usuario");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-
+  const [usuario, setUsuarioState] = useState<Pessoa | null>(null); // Inicializa com null
   const [planoUsuario, setPlanoUsuario] = useState<Plano | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false); // <--- NOVO ESTADO: Começa como false
+
+  const isAuthenticated = !!usuario;
+
+  // Ref para garantir que a inicialização do localStorage só aconteça uma vez
+  const isInitialized = useRef(false);
+
+  // Efeito para carregar o usuário do localStorage na montagem inicial do AuthProvider
+  useEffect(() => {
+    if (!isInitialized.current) { // Garante que roda apenas uma vez
+      const storedUser = localStorage.getItem("usuario");
+      if (storedUser) {
+        setUsuarioState(JSON.parse(storedUser));
+      }
+      setIsAuthReady(true); // <--- Marca como pronto APÓS verificar localStorage
+      isInitialized.current = true;
+    }
+  }, []);
 
   const setUsuario = (user: Pessoa | null) => {
     if (user) {
@@ -51,13 +67,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (usuario) {
+    if (isAuthReady && usuario) { 
       carregarPlanoUsuario();
-    } else {
+    } else if (isAuthReady && !usuario) { 
       setPlanoUsuario(null);
     }
-  }, [usuario, carregarPlanoUsuario]);
-
+  }, [usuario, carregarPlanoUsuario, isAuthReady]); 
   return (
     <AuthContext.Provider
       value={{
@@ -65,6 +80,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUsuario,
         planoUsuario,
         carregarPlanoUsuario,
+        isAuthenticated,
+        isAuthReady, 
       }}
     >
       {children}

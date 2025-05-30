@@ -6,7 +6,7 @@ export default function Header() {
       <nav style={navStyle}>
         <Link to="/home" style={linkStyle}>Home</Link>
         <Link to="/perfil" style={linkStyle}>Perfil</Link>
-        <Link to="/Plano" style={linkStyle}>Plano</Link>
+        <Link to="/planoPage" style={linkStyle}>Plano</Link>
         <Link to="/login" style={linkStyle}>Sair</Link>
       </nav>
     </header>

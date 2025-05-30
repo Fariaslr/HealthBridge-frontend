@@ -1,18 +1,29 @@
-// src/services/authService.ts
 import axios from "axios";
-import type { Pessoa } from "../models/Pessoa"; // Tipo de retorno: a entidade completa
+import type { Pessoa } from "../models/Pessoa"; 
 import type { CadastroInput, EducadorFisicoInput, NutricionistaInput, PacienteInput, TipoCadastro } from "../types/cadastroTypes";
 
 const API_BASE = "http://localhost:8080";
 
-// Exemplo da função de login (usando axios e API_BASE para consistência)
 export async function login(email: string, senha: string): Promise<Pessoa> {
-  const response = await axios.post<Pessoa>(`${API_BASE}/auth/login`, { email, senha });
-  return response.data;
+  try {
+    const response = await axios.post<Pessoa>(`${API_BASE}/auth/login`, { email, senha });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 401) {
+        const errorMessage = error.response.data?.message || "Email ou senha inválidos.";
+        throw new Error(errorMessage);
+      } else if (error.response.status === 403) {
+        throw new Error("Acesso negado.");
+      } else {
+        throw new Error(`Erro de autenticação: ${error.response.statusText || "Erro desconhecido"}`);
+      }
+    } else {
+      throw new Error("Erro de conexão. Verifique sua rede.");
+    }
+  }
 }
 
-// Funções para cadastrar tipos específicos de usuário
-// Agora recebem os tipos de *Input* correspondentes
 export async function cadastrarPaciente(dados: PacienteInput): Promise<Pessoa> {
   const response = await axios.post<Pessoa>(`${API_BASE}/pacientes`, dados);
   return response.data;

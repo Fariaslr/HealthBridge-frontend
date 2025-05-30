@@ -3,14 +3,19 @@ import Home from "./pages/Home";
 import Cadastro from "./pages/Cadastro";
 import Login from "./pages/Login";
 import Consultas from "./pages/ConsultaPage.tsx";
-import Plano from "./pages/PlanoPage.tsx";
+import PlanoPage from "./pages/PlanoPage.tsx";
 import Perfil from "./pages/Perfil";
-import { useAuth } from "./context/AuthContext";
-import Layout from "./components/Layout"; // importe o Layout que você criou
+import { useAuth } from "./context/AuthContext"; // Importe useAuth
+import Layout from "./components/Layout";
 import type { JSX } from "react";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
-  const { usuario } = useAuth();
+  const { usuario, isAuthReady } = useAuth(); 
+
+  if (!isAuthReady) {
+   
+    return <p>Carregando autenticação...</p>;
+  }
   return usuario ? children : <Navigate to="/login" />;
 }
 
@@ -21,7 +26,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
 
-        {/* Rotas com Header e Layout */}
         <Route
           element={
             <PrivateRoute>
@@ -29,14 +33,12 @@ function App() {
             </PrivateRoute>
           }
         >
-          {/* Aqui vão as rotas que estarão dentro do Layout */}
           <Route path="/home" element={<Home />} />
-          <Route path="/consultas" element={<Consultas />} />
-          <Route path="/plano" element={<Plano />} />
+          <Route path="/Consultas" element={<Consultas />} />
+          <Route path="/PlanoPage" element={<PlanoPage />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
 
-        {/* Rota coringa */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

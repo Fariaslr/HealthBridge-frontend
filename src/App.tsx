@@ -8,6 +8,7 @@ import Perfil from "./pages/Perfil";
 import { useAuth } from "./context/AuthContext"; // Importe useAuth
 import Layout from "./components/Layout";
 import type { JSX } from "react";
+import ConsultaPage from "./pages/ConsultaPage.tsx";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { usuario, isAuthReady } = useAuth(); 
@@ -34,8 +35,8 @@ function App() {
           }
         >
           <Route path="/home" element={<Home />} />
-          <Route path="/Consultas" element={<Consultas />} />
-          <Route path="/PlanoPage" element={<PlanoPage />} />
+          <Route path="/consultas" element={<ConsultaPage />} />
+          <Route path="/planoPage" element={<PlanoPage />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
 

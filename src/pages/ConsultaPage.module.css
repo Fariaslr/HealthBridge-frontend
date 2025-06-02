@@ -1,7 +1,7 @@
-/* src/pages/ConsultaPage.module.css */
-
 .container {
-  padding: 30px;
+  padding: 30px;  
+  width: 100vw;
+  height: 100vh;
   max-width: 900px;
   margin: 0 auto;
   font-family: 'Arial', sans-serif;

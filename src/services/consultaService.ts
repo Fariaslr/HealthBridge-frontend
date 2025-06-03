@@ -6,9 +6,9 @@ import type { Consulta } from "../models/Consulta";
 const API_BASE = "http://localhost:8080"; // A URL base da sua API
 
 export type ConsultaRecordDto = {
-  dataHora: string; 
-  observacoes?: string; 
-  pacienteId: string;
+  planoId: string,                     
+  peso: number;
+  altura: number;       
   profissionalSaudeId: string;
 };
 

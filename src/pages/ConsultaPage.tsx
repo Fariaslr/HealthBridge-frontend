@@ -1,185 +1,276 @@
-// src/pages/ConsultaPage.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   listarConsultas,
   buscarConsultasPorPacienteId,
   buscarConsultasPorProfissionalSaudeId,
   criarConsulta,
+  atualizarConsulta, // Certifique-se de que esta função está no seu service
   type ConsultaRecordDto,
-} from "../services/consultaService";
+} from "../services/consultaService"; // Assumindo que você tem um service para Consulta
 import styles from "./ConsultaPage.module.css";
-import type { Consulta } from "../models/Consulta";
+import type { Consulta } from "../models/Consulta"; // Importe o modelo de consulta
 
-import ModalConsulta from "../components/ModalConsulta"; 
-
-interface NovaConsultaFormState {
-  planoId: string; 
-  profissionalSaudeId: string;
-  dataConsulta: string; 
-  peso: string;
-  altura: string;
-  numeroRefeicoes: string;
-  torax?: string;
-  abdomen?: string;
-  cintura?: string;
-  quadril?: string;
-  bracoEsquerdo?: string;
-  bracoDireito?: string;
-  antibracoEsquerdo?: string;
-  antibracoDireito?: string;
-  coxaEsquerda?: string;
-  coxaDireita?: string;
-  panturrilhaEsquerda?: string;
-  panturrilhaDireita?: string;
-  pescoco?: string;
-}
+import ModalBase from "../components/ModalBase";
+import ConsultaForm, { type ConsultaFormData } from "../components/ConsultaForm";
+import ConsultaDetail from "../components/ConsultaDetail";
 
 export default function ConsultaPage() {
   const { usuario, isAuthenticated } = useAuth();
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalCriarConsultaOpen, setIsModalCriarConsultaOpen] = useState(false);
-  const [criandoConsulta, setCriandoConsulta] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null); 
-
-  const initialNovaConsultaState: NovaConsultaFormState = {
-    planoId: "",
-    profissionalSaudeId: "",
-    dataConsulta: "",
-    peso: "",
-    altura: "",
-    numeroRefeicoes: "",
-    torax: "",
-    abdomen: "",
-    cintura: "",
-    quadril: "",
-    bracoEsquerdo: "",
-    bracoDireito: "",
-    antibracoEsquerdo: "",
-    antibracoDireito: "",
-    coxaEsquerda: "",
-    coxaDireita: "",
-    panturrilhaEsquerda: "",
-    panturrilhaDireita: "",
-    pescoco: "",
-  };
-  const [novaConsultaFormData, setNovaConsultaFormData] = useState<NovaConsultaFormState>(initialNovaConsultaState);
-
-  useEffect(() => {
-    async function carregarConsultas() {
-      if (!usuario?.id) {
-        setLoading(false);
-        setError("Usuário não autenticado.");
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        let fetchedConsultas: Consulta[] = [];
-        if (usuario.tipoUsuario === "Paciente") {
-          fetchedConsultas = await buscarConsultasPorPacienteId(usuario.id);
-        } else if (usuario.tipoUsuario === "Nutricionista" || usuario.tipoUsuario === "EducadorFisico") {
-          fetchedConsultas = await buscarConsultasPorProfissionalSaudeId(usuario.id);
-        } else {
-          fetchedConsultas = await listarConsultas();
-        }
-        setConsultas(fetchedConsultas);
-      } catch (err: any) {
-        console.error("Erro ao carregar consultas:", err);
-        setError(err.message || "Não foi possível carregar as consultas.");
-      } finally {
-        setLoading(false);
-      }
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [currentConsultaData, setCurrentConsultaData] = useState<ConsultaFormData | undefined>(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiErrorSubmit, setApiErrorSubmit] = useState<string | null>(null); // Erros da API para o submit
+  const carregarConsultas = useCallback(async () => {
+    if (!usuario?.id) {
+      setLoading(false);
+      setError("Usuário não autenticado.");
+      return;
     }
 
+    setLoading(true);
+    setError(null);
+    try {
+      let fetchedConsultas: Consulta[] = [];
+      if (usuario.tipoUsuario === "Paciente") {
+        fetchedConsultas = await buscarConsultasPorPacienteId(usuario.id);
+      } else if (usuario.tipoUsuario === "Nutricionista" || usuario.tipoUsuario === "EducadorFisico") {
+        fetchedConsultas = await buscarConsultasPorProfissionalSaudeId(usuario.id);
+      } else {
+        fetchedConsultas = await listarConsultas();
+      }
+      setConsultas(fetchedConsultas);
+    } catch (err: any) {
+      console.error("Erro ao carregar consultas:", err);
+      setError(err.message || "Não foi possível carregar as consultas.");
+    } finally {
+      setLoading(false);
+    }
+  }, [usuario]); // Depende apenas de 'usuario'
+
+  // Efeito para carregar consultas ao montar o componente ou mudar o usuário/autenticação
+  useEffect(() => {
     if (isAuthenticated) {
       carregarConsultas();
     } else {
       setLoading(false);
       setError("Faça login para ver suas consultas.");
     }
-  }, [usuario, isAuthenticated]);
+  }, [isAuthenticated, carregarConsultas]); // Depende de isAuthenticated e da função memoizada
 
-  const abrirModalCriarConsulta = () => {
-    setNovaConsultaFormData(prev => ({
-      ...initialNovaConsultaState, 
-      planoId: usuario?.tipoUsuario === "Paciente" ? usuario.id : "",
-      profissionalSaudeId: (usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico")
-        ? usuario.id
-        : ""
-    }));
-    setFormError(null); 
-    setIsModalCriarConsultaOpen(true);
-  };
+  // Função para abrir o modal em diferentes modos (create, edit, view)
+  const abrirModal = (mode: 'create' | 'edit' | 'view', consulta?: Consulta) => {
+    setApiErrorSubmit(null); // Limpa erros anteriores de submissão
+    setModalMode(mode);       // Define o modo do modal
 
-  const fecharModalCriarConsulta = () => {
-    setIsModalCriarConsultaOpen(false);
-    setNovaConsultaFormData(initialNovaConsultaState);
-    setFormError(null);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNovaConsultaFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleCriarNovaConsultaSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null); 
-
-    if (!usuario) {
-      setFormError("Usuário não autenticado. Por favor, faça login.");
-      return;
-    }
-    if (!novaConsultaFormData.planoId || !novaConsultaFormData.profissionalSaudeId || !novaConsultaFormData.dataConsulta || !novaConsultaFormData.peso || !novaConsultaFormData.altura || !novaConsultaFormData.numeroRefeicoes) {
-      setFormError('Campos obrigatórios (ID do Plano, ID do Profissional, Data/Hora, Peso, Altura, Nº Refeições) devem ser preenchidos.');
-      return;
-    }
-
-    setCriandoConsulta(true);
-    try {
-      const consultaDto: ConsultaRecordDto = {
-        dataHora: new Date(novaConsultaFormData.dataConsulta).toISOString(), 
-        observacoes: `Peso: ${novaConsultaFormData.peso}kg, Altura: ${novaConsultaFormData.altura}cm, Refeições: ${novaConsultaFormData.numeroRefeicoes}. ` +
-                     `Medidas: Tórax: ${novaConsultaFormData.torax || '-'}cm, Abdômen: ${novaConsultaFormData.abdomen || '-'}cm, Cintura: ${novaConsultaFormData.cintura || '-'}cm, Quadril: ${novaConsultaFormData.quadril || '-'}cm, ` +
-                     `Braço E: ${novaConsultaFormData.bracoEsquerdo || '-'}cm, Braço D: ${novaConsultaFormData.bracoDireito || '-'}cm, Antebraço E: ${novaConsultaFormData.antibracoEsquerdo || '-'}cm, Antebraço D: ${novaConsultaFormData.antibracoDireito || '-'}cm, ` +
-                     `Coxa E: ${novaConsultaFormData.coxaEsquerda || '-'}cm, Coxa D: ${novaConsultaFormData.coxaDireita || '-'}cm, Panturrilha E: ${novaConsultaFormData.panturrilhaEsquerda || '-'}cm, Panturrilha D: ${novaConsultaFormData.panturrilhaDireita || '-'}cm, ` +
-                     `Pescoço: ${novaConsultaFormData.pescoco || '-'}cm.`,
-        pacienteId: novaConsultaFormData.planoId,
-        profissionalSaudeId: novaConsultaFormData.profissionalSaudeId,
+    if (mode === 'create') {
+      // Preenche os defaults para a criação de uma nova consulta
+      setCurrentConsultaData({
+        planoId: usuario?.tipoUsuario === "Paciente" ? usuario.id : '',
+        profissionalSaudeId: (usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico") ? usuario.id : '',
+        dataConsulta: '', peso: '', altura: '', numeroRefeicoes: '',
+        torax: '', abdomen: '', cintura: '', quadril: '', bracoEsquerdo: '', bracoDireito: '',
+        antibracoEsquerdo: '', antibracoDireito: '', coxaEsquerda: '', coxaDireita: '',
+        panturrilhaEsquerda: '', panturrilhaDireita: '', pescoco: '',
+        observacoes: '',
+      });
+    } else if (consulta) {
+      // Mapeia a Consulta (do backend) para ConsultaFormData (para o formulário/detalhes)
+      // ATENÇÃO: É CRÍTICO que esta lógica de extração das medidas da string 'observacoes'
+      // seja robusta ou que seu backend forneça campos separados.
+      const mappedData: ConsultaFormData = {
+        id: consulta.id,
+        planoId: consulta.paciente.id, // Supondo que planoId do form é o pacienteId
+        profissionalSaudeId: consulta.profissionalSaude.id,
+        dataConsulta: new Date(consulta.dataHora).toISOString().slice(0, 16), // Formato para input datetime-local
+        // Inicializa todos os campos de medida e observações
+        peso: '', altura: '', numeroRefeicoes: '', torax: '', abdomen: '', cintura: '',
+        quadril: '', bracoEsquerdo: '', bracoDireito: '', antibracoEsquerdo: '', antibracoDireito: '',
+        coxaEsquerda: '', coxaDireita: '', panturrilhaEsquerda: '', panturrilhaDireita: '', pescoco: '',
+        observacoes: '',
       };
 
-      const consultaCriada = await criarConsulta(consultaDto);
-      setConsultas(prev => [...prev, consultaCriada]); 
-      fecharModalCriarConsulta(); 
-      alert("Consulta agendada com sucesso!");
+      // Função auxiliar para extrair medidas de uma string (MELHORE ESTA LÓGICA!)
+      const extractMeasure = (obs: string | undefined, regex: RegExp) => {
+        const match = obs ? regex.exec(obs) : null;
+        return match && match[1] ? match[1] : '';
+      };
+
+      // Popula os campos com base na extração
+      if (consulta.observacoes) {
+        mappedData.peso = extractMeasure(consulta.observacoes, /Peso: ([\d.]+)kg/);
+        mappedData.altura = extractMeasure(consulta.observacoes, /Altura: ([\d.]+)cm/);
+        mappedData.numeroRefeicoes = extractMeasure(consulta.observacoes, /Refeições: ([\d.]+)/);
+        mappedData.torax = extractMeasure(consulta.observacoes, /Tórax: ([\d.]+)cm/);
+        mappedData.abdomen = extractMeasure(consulta.observacoes, /Abdômen: ([\d.]+)cm/);
+        mappedData.cintura = extractMeasure(consulta.observacoes, /Cintura: ([\d.]+)cm/);
+        mappedData.quadril = extractMeasure(consulta.observacoes, /Quadril: ([\d.]+)cm/);
+        mappedData.bracoEsquerdo = extractMeasure(consulta.observacoes, /Braço Esquerdo: ([\d.]+)cm/);
+        mappedData.bracoDireito = extractMeasure(consulta.observacoes, /Braço Direito: ([\d.]+)cm/);
+        mappedData.antibracoEsquerdo = extractMeasure(consulta.observacoes, /Antebraço Esquerdo: ([\d.]+)cm/);
+        mappedData.antibracoDireito = extractMeasure(consulta.observacoes, /Antebraço Direito: ([\d.]+)cm/);
+        mappedData.coxaEsquerda = extractMeasure(consulta.observacoes, /Coxa Esquerda: ([\d.]+)cm/);
+        mappedData.coxaDireita = extractMeasure(consulta.observacoes, /Coxa Direita: ([\d.]+)cm/);
+        mappedData.panturrilhaEsquerda = extractMeasure(consulta.observacoes, /Panturrilha Esquerda: ([\d.]+)cm/);
+        mappedData.panturrilhaDireita = extractMeasure(consulta.observacoes, /Panturrilha Direita: ([\d.]+)cm/);
+        mappedData.pescoco = extractMeasure(consulta.observacoes, /Pescoço: ([\d.]+)cm/);
+
+        // Separa observações gerais do restante (se o formato da string for complexo)
+        // Isso é uma simplificação. Se as observações gerais são apenas o que sobra, use isso.
+        // mappedData.observacoes = consulta.observacoes.replace(/Peso:.*?cm\./, '').trim();
+        // Ou, se a observação geral é um campo separado no seu modelo Consulta, use-o diretamente.
+        mappedData.observacoes = consulta.observacoes; // Por simplicidade, mantém tudo em observacoes
+      }
+
+      setCurrentConsultaData(mappedData);
+    } else {
+      // Se não há consulta e não é modo 'create', limpa os dados
+      setCurrentConsultaData(undefined);
+    }
+    setIsModalOpen(true); // Abre o modal
+  };
+
+  const fecharModal = () => {
+    setIsModalOpen(false);
+    setCurrentConsultaData(undefined); // Limpa os dados ao fechar
+    setApiErrorSubmit(null); // Limpa erros da API
+  };
+
+  // Função chamada pelo ConsultaForm quando o botão "Editar" é clicado no modo "view"
+  const handleEditModeRequest = (data: ConsultaFormData) => {
+    setModalMode('edit'); // Mudar para o modo de edição
+    setCurrentConsultaData(data); // Opcional: garantir que os dados estejam atualizados (já deveriam estar)
+    // Não precisa setIsModalOpen(true) pois o modal já está aberto
+  };
+
+  const handleFormSubmit = async (formData: ConsultaFormData) => {
+    if (!usuario) {
+      const authError = "Usuário não autenticado. Por favor, faça login.";
+      setApiErrorSubmit(authError);
+      throw new Error(authError);
+    }
+
+    setIsSubmitting(true);
+    setApiErrorSubmit(null);
+
+    try {
+      let finalDataHora: string;
+      const parsedDate = new Date(formData.dataConsulta);
+
+      if (isNaN(parsedDate.getTime())) {
+        const errorMessage = "A data e hora da consulta são inválidas. Por favor, verifique o campo.";
+        setApiErrorSubmit(errorMessage);
+        throw new Error(errorMessage);
+      }
+      finalDataHora = parsedDate.toISOString();
+
+      if (!formData.planoId) {
+        const errorMessage = "ID do Paciente é obrigatório.";
+        setApiErrorSubmit(errorMessage);
+        throw new Error(errorMessage);
+      }
+      if (!formData.profissionalSaudeId) {
+        const errorMessage = "ID do Profissional é obrigatório.";
+        setApiErrorSubmit(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      // Dentro de handleFormSubmit em ConsultaPage.tsx
+      const consultaDto: ConsultaRecordDto = {
+        dataConsulta: finalDataHora, // Use dataConsulta aqui, correspondendo ao DTO Java
+        peso: parseFloat(formData.peso),
+        altura: parseFloat(formData.altura),
+        numeroRefeicoes: parseInt(formData.numeroRefeicoes),
+        torax: formData.torax ? parseFloat(formData.torax) : null,
+        abdomen: formData.abdomen ? parseFloat(formData.abdomen) : null,
+        cintura: formData.cintura ? parseFloat(formData.cintura) : null,
+        quadril: formData.quadril ? parseFloat(formData.quadril) : null,
+        bracoEsquerdo: formData.bracoEsquerdo ? parseFloat(formData.bracoEsquerdo) : null,
+        bracoDireito: formData.bracoDireito ? parseFloat(formData.bracoDireito) : null,
+        antibracoEsquerdo: formData.antibracoEsquerdo ? parseFloat(formData.antibracoEsquerdo) : null,
+        antibracoDireito: formData.antibracoDireito ? parseFloat(formData.antibracoDireito) : null,
+        coxaEsquerda: formData.coxaEsquerda ? parseFloat(formData.coxaEsquerda) : null,
+        coxaDireita: formData.coxaDireita ? parseFloat(formData.coxaDireita) : null,
+        panturrilhaEsquerda: formData.panturrilhaEsquerda ? parseFloat(formData.panturrilhaEsquerda) : null,
+        panturrilhaDireita: formData.panturrilhaDireita ? parseFloat(formData.panturrilhaDireita) : null,
+        pescoco: formData.pescoco ? parseFloat(formData.pescoco) : null,
+
+        observacoes: formData.observacoes || null,
+
+        planoId: formData.planoId, // <-- CORRIGIDO: Use 'planoId' para o DTO aqui
+        profissionalSaudeId: formData.profissionalSaudeId,
+      };
+      let result: Consulta;
+      if (modalMode === 'create') {
+        result = await criarConsulta(consultaDto);
+        setConsultas(prev => [...prev, result]);
+        alert("Consulta agendada com sucesso!");
+      } else if (modalMode === 'edit' && formData.id) {
+        result = await atualizarConsulta(formData.id, consultaDto);
+        setConsultas(prev => prev.map(c => c.id === result.id ? result : c));
+        alert("Consulta atualizada com sucesso!");
+      } else {
+        throw new Error("Modo de operação do modal inválido ou ID ausente para edição.");
+      }
+
+      fecharModal();
     } catch (err: any) {
-      console.error("Erro ao agendar consulta:", err);
-      setFormError(err.message || "Erro desconhecido ao agendar consulta.");
+      console.error("Erro na operação da consulta:", err);
+      const errorMessage = apiErrorSubmit || err.message || "Erro desconhecido na operação da consulta.";
+      setApiErrorSubmit(errorMessage);
+      throw new Error(errorMessage);
     } finally {
-      setCriandoConsulta(false);
+      setIsSubmitting(false);
     }
   };
 
-  const camposMedidas = [
-    { label: 'Tórax (cm)', name: 'torax', value: novaConsultaFormData.torax },
-    { label: 'Abdômen (cm)', name: 'abdomen', value: novaConsultaFormData.abdomen },
-    { label: 'Cintura (cm)', name: 'cintura', value: novaConsultaFormData.cintura },
-    { label: 'Quadril (cm)', name: 'quadril', value: novaConsultaFormData.quadril },
-    { label: 'Braço Esquerdo (cm)', name: 'bracoEsquerdo', value: novaConsultaFormData.bracoEsquerdo },
-    { label: 'Braço Direito (cm)', name: 'bracoDireito', value: novaConsultaFormData.bracoDireito },
-    { label: 'Antebraço Esquerdo (cm)', name: 'antibracoEsquerdo', value: novaConsultaFormData.antibracoEsquerdo },
-    { label: 'Antebraço Direito (cm)', name: 'antibracoDireito', value: novaConsultaFormData.antibracoDireito },
-    { label: 'Coxa Esquerda (cm)', name: 'coxaEsquerda', value: novaConsultaFormData.coxaEsquerda },
-    { label: 'Coxa Direita (cm)', name: 'coxaDireita', value: novaConsultaFormData.coxaDireita },
-    { label: 'Panturrilha Esquerda (cm)', name: 'panturrilhaEsquerda', value: novaConsultaFormData.panturrilhaEsquerda },
-    { label: 'Panturrilha Direita (cm)', name: 'panturrilhaDireita', value: novaConsultaFormData.panturrilhaDireita },
-    { label: 'Pescoço (cm)', name: 'pescoco', value: novaConsultaFormData.pescoco },
-  ];
+  const getModalContent = () => {
+    if (!currentConsultaData) {
+      // Se não houver dados quando o modal deveria estar aberto, pode ser um estado inválido
+      return <p>Carregando dados do modal ou erro inesperado.</p>;
+    }
 
+    if (modalMode === 'view') {
+      // No modo 'view', exibe os detalhes da consulta
+      // Precisamos da 'Consulta' completa aqui, não apenas o 'ConsultaFormData'
+      const fullConsulta = consultas.find(c => c.id === currentConsultaData.id);
+      return fullConsulta ? (
+        <>
+          <ConsultaDetail consulta={fullConsulta} />
+          {/* Ações específicas para o modo de visualização dentro do modal */}
+          <div className={styles.modalActions}>
+            {(usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico") && (
+              <button
+                onClick={() => handleEditModeRequest(currentConsultaData)} // Botão Editar no MODO VIEW
+                className={`${styles.button} ${styles.buttonPrimary}`}
+              >
+                Editar
+              </button>
+            )}
+            <button onClick={fecharModal} className={`${styles.button} ${styles.buttonSecondary}`}>Fechar</button>
+          </div>
+        </>
+      ) : <p>Detalhes da consulta não encontrados.</p>;
+    } else {
+      return (
+        <ConsultaForm
+          initialData={currentConsultaData}
+          mode={modalMode}
+          isLoading={isSubmitting}
+          apiError={apiErrorSubmit}
+          onCancel={fecharModal} // Botão "Cancelar" do formulário fecha o modal
+          onFormSubmit={handleFormSubmit} // Formulário chama este para submeter/atualizar
+          onEditRequest={handleEditModeRequest} // Formulário chama este para mudar de view->edit
+        />
+      );
+    }
+  };
+
+  // Exibição de mensagens de carregamento ou erro na página
   if (loading) {
     return <p className={styles.loadingMessage}>Carregando consultas...</p>;
   }
@@ -191,12 +282,14 @@ export default function ConsultaPage() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Minhas Consultas</h1>
+      {/* Botão para agendar nova consulta (aparece para tipos de usuário específicos) */}
       {(usuario?.tipoUsuario === "Paciente" || usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico") && (
-        <button onClick={abrirModalCriarConsulta} className={styles.createButton}>
+        <button onClick={() => abrirModal('create')} className={styles.createButton}>
           Agendar Nova Consulta
         </button>
       )}
 
+      {/* Exibição da lista de consultas */}
       {consultas.length === 0 ? (
         <p className={styles.noConsultasMessage}>Nenhuma consulta encontrada.</p>
       ) : (
@@ -211,176 +304,41 @@ export default function ConsultaPage() {
                 Criado em: {new Date(consulta.dataCriacao).toLocaleDateString('pt-BR')} |
                 Última Atualização: {new Date(consulta.dataAtualizacao).toLocaleDateString('pt-BR')}
               </p>
+              <div className={styles.cardActions}>
+                <button
+                  onClick={() => abrirModal('view', consulta)}
+                  className={`${styles.button} ${styles.buttonSecondary}`}
+                >
+                  Ver Detalhes
+                </button>
+                {/* Botão de edição visível apenas para profissionais */}
+                {(usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico") && (
+                  <button
+                    onClick={() => abrirModal('edit', consulta)}
+                    className={`${styles.button} ${styles.buttonPrimary}`}
+                  >
+                    Editar
+                  </button>
+                )}
+                {/* Adicionar botão de exclusão aqui, se aplicável */}
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Modal de Agendamento/Criação usando ModalConsulta genérico */}
-      <ModalConsulta
-        isOpen={isModalCriarConsultaOpen} // Controla a visibilidade
-        onClose={fecharModalCriarConsulta} // Chamado ao fechar o modal
-        title="Agendar Nova Consulta" // Título do modal
+      {/* Renderiza o ModalBase com o conteúdo dinâmico (formulário ou detalhes) */}
+      <ModalBase
+        isOpen={isModalOpen}
+        onClose={fecharModal}
+        title={ // Título dinâmico do modal
+          modalMode === 'create' ? 'Agendar Nova Consulta' :
+            modalMode === 'edit' ? 'Editar Consulta' :
+              'Detalhes da Consulta'
+        }
       >
-        {/* O conteúdo do modal é o formulário completo */}
-        <form onSubmit={handleCriarNovaConsultaSubmit} className="space-y-4">
-          {formError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
-              {formError}
-            </div>
-          )}
-
-          {/* IDs e Data */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="planoId" className="block text-sm font-medium text-gray-700 mb-1">
-                ID do Paciente <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="planoId" // Usando planoId aqui para mapear para pacienteId no DTO
-                name="planoId"
-                value={novaConsultaFormData.planoId}
-                onChange={handleInputChange}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                disabled={usuario?.tipoUsuario === "Paciente"}
-                placeholder={usuario?.tipoUsuario === "Paciente" ? "Seu ID" : "ID do Paciente"}
-              />
-            </div>
-            <div>
-              <label htmlFor="profissionalSaudeId" className="block text-sm font-medium text-gray-700 mb-1">
-                ID do Profissional <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="profissionalSaudeId"
-                name="profissionalSaudeId"
-                value={novaConsultaFormData.profissionalSaudeId}
-                onChange={handleInputChange}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                disabled={usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico"}
-                placeholder={(usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico") ? "Seu ID" : "ID do Profissional"}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="dataConsulta" className="block text-sm font-medium text-gray-700 mb-1">
-              Data e Hora da Consulta <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="datetime-local"
-              id="dataConsulta"
-              name="dataConsulta"
-              value={novaConsultaFormData.dataConsulta}
-              onChange={handleInputChange}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-
-          {/* Peso, Altura, Refeições */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="peso" className="block text-sm font-medium text-gray-700 mb-1">
-                Peso (kg) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="peso"
-                name="peso"
-                value={novaConsultaFormData.peso}
-                onChange={handleInputChange}
-                required
-                step="0.01"
-                min="0"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Ex: 70.5"
-              />
-            </div>
-            <div>
-              <label htmlFor="altura" className="block text-sm font-medium text-gray-700 mb-1">
-                Altura (cm) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="altura"
-                name="altura"
-                value={novaConsultaFormData.altura}
-                onChange={handleInputChange}
-                required
-                step="0.1"
-                min="0"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Ex: 175"
-              />
-            </div>
-            <div>
-              <label htmlFor="numeroRefeicoes" className="block text-sm font-medium text-gray-700 mb-1">
-                Nº de Refeições <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="numeroRefeicoes"
-                name="numeroRefeicoes"
-                value={novaConsultaFormData.numeroRefeicoes}
-                onChange={handleInputChange}
-                required
-                step="1"
-                min="1"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Ex: 5"
-              />
-            </div>
-          </div>
-
-          {/* Seção de Medidas */}
-          <h3 className="text-lg font-medium text-gray-800 pt-2 border-t mt-6">Medidas Corporais (Opcional)</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {camposMedidas.map(campo => (
-              <div key={campo.name}>
-                <label htmlFor={campo.name} className="block text-sm font-medium text-gray-700 mb-1">
-                  {campo.label}
-                </label>
-                <input
-                  type="number"
-                  id={campo.name}
-                  name={campo.name}
-                  value={campo.value}
-                  onChange={handleInputChange}
-                  step="0.1"
-                  min="0"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Opcional"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Campo de Observações Gerais */}
-
-          {/* Botões de Ação do formulário - dentro do ModalConsulta */}
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={fecharModalCriarConsulta}
-              disabled={criandoConsulta}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={criandoConsulta}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-indigo-400"
-            >
-              {criandoConsulta ? 'Agendando...' : 'Agendar Consulta'}
-            </button>
-          </div>
-        </form>
-      </ModalConsulta>
+        {getModalContent()} {/* Conteúdo renderizado pelo getModalContent */}
+      </ModalBase>
     </div>
   );
 }

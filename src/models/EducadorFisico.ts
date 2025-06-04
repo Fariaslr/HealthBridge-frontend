@@ -1,5 +1,6 @@
-import type { Pessoa } from "./Pessoa";
+import type { ProfissionalSaude } from "./ProfissionalSaude";
 
-export interface EducadorFisico extends Pessoa{
-  cref: string;
+export interface EducadorFisico extends ProfissionalSaude {
+    tipoUsuario: "EducadorFisico";
+    cref: string | null; 
 }

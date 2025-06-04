@@ -1,5 +1,4 @@
 import type { Endereco } from "./Endereco";
-import type { Plano } from "./Plano";
 import type { Sexo } from "./Sexo";
 
 export type Pessoa = {
@@ -12,7 +11,6 @@ export type Pessoa = {
   email: string;
   dataNascimento: string;
   sexo: Sexo;
-  tipoUsuario: string;
+  tipoUsuario: "Paciente" | "Nutricionista" | "EducadorFisico";
   endereco: Endereco;
-  plano: Plano;
 };

@@ -1,24 +1,29 @@
 import React, { useState, useEffect, type FormEvent } from 'react';
-// Adicione a palavra-chave 'type' antes de FormEvent
-import styles from './ConsultaForm.module.css'; // Novo CSS Module para o formulário
+import styles from './ConsultaForm.module.css';
 
+// --- INTERFACE CORRIGIDA: planoId de volta, e types para userType/userId ---
 export interface ConsultaFormData {
-  id?: string; // Para edição
-  planoId: string;
+  id?: string;
+  planoId: string; // <-- DE VOLTA: Profissionais precisam digitar o ID do plano do paciente
   profissionalSaudeId: string;
   peso: string;
   altura: string;
 }
 
 interface ConsultaFormProps {
-  initialData?: ConsultaFormData; // Dados iniciais para preencher o formulário
-  mode: 'create' | 'edit' | 'view'; // Modo do formulário
-  isLoading?: boolean; // Se a submissão está em progresso
-  apiError?: string | null; // Erro da API para exibição
-  onCancel: () => void; // Para o botão Cancelar
-  onFormSubmit: (data: ConsultaFormData) => Promise<void>; 
+  initialData?: ConsultaFormData;
+  mode: 'create' | 'edit' | 'view';
+  isLoading?: boolean;
+  apiError?: string | null;
+  onCancel: () => void;
+  onFormSubmit: (data: ConsultaFormData) => Promise<void>;
   onEditRequest?: (data: ConsultaFormData) => void;
+  // NOVOS PROPS
+  userType?: "Paciente" | "Nutricionista" | "EducadorFisico" | string; // Adicione o tipo de usuário
+  userId?: string; // Adicione o ID do usuário
 }
+// --- FIM DA INTERFACE CORRIGIDA ---
+
 
 const ConsultaForm: React.FC<ConsultaFormProps> = ({
   initialData,
@@ -28,23 +33,50 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
   onCancel,
   onFormSubmit,
   onEditRequest,
+  userType, // <-- DESESTRUTURADO
+  userId,   // <-- DESESTRUTURADO
 }) => {
+  // --- initialState CORRIGIDO ---
   const initialState: ConsultaFormData = {
     id: initialData?.id || '',
-    planoId: initialData?.planoId || '',
+    planoId: initialData?.planoId || '', // <-- DE VOLTA AQUI
     profissionalSaudeId: initialData?.profissionalSaudeId || '',
     peso: initialData?.peso || '',
     altura: initialData?.altura || '',
   };
+  // --- FIM DO initialState CORRIGIDO ---
 
   const [formData, setFormData] = useState<ConsultaFormData>(initialState);
   const [formValidationErrors, setFormValidationErrors] = useState<string | null>(null);
-  useEffect(() => {
-    setFormData(initialState);
-    setFormValidationErrors(null);
-  }, [initialData, mode]); // Recria o estado se initialData ou mode mudar
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    setFormData({
+      id: initialData?.id || '',
+      planoId: initialData?.planoId || '', // <-- DE VOLTA AQUI
+      profissionalSaudeId: initialData?.profissionalSaudeId || '',
+      peso: initialData?.peso ? String(initialData.peso) : '',
+      altura: initialData?.altura ? String(initialData.altura) : '',
+    });
+    setFormValidationErrors(null);
+  }, [initialData, mode]);
+
+  // Efeito para pré-preencher IDs baseados no userType
+  useEffect(() => {
+    // Pré-preencher planoId para Paciente
+    if (userType === "Paciente" && userId && !formData.planoId) {
+        // Assume que userId aqui é o ID do plano do paciente, ou que o ID do plano é passado de alguma forma.
+        // Se o planoId do paciente vem de 'planoUsuario.id' na ConsultaPage, ele deve ser passado como initialData.planoId
+        // aqui. O formData.planoId só é atualizado por input.
+        // Para o paciente, o input de planoId deve ser disabled e preenchido via initialData.
+        // Então, esta parte do useEffect não é necessária para o planoId do paciente.
+    }
+    // Pré-preencher profissionalSaudeId para ProfissionalSaude
+    if ((userType === "Nutricionista" || userType === "EducadorFisico") && userId && !formData.profissionalSaudeId) {
+      setFormData(prev => ({ ...prev, profissionalSaudeId: userId }));
+    }
+  }, [userId, userType, formData.profissionalSaudeId]); // Adicione formData.planoId se precisar de pré-preenchimento complexo
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -54,25 +86,17 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
     setFormValidationErrors(null);
 
     if (mode !== 'view') {
-        if (!formData.planoId || !formData.profissionalSaudeId || !formData.dataConsulta ||
-            !formData.peso || !formData.altura || !formData.numeroRefeicoes) {
-          setFormValidationErrors('Por favor, preencha todos os campos obrigatórios.');
-          return;
-        }
-
-        const parsedDate = new Date(formData.dataConsulta);
-        if (isNaN(parsedDate.getTime())) {
-          setFormValidationErrors('Formato de data e hora inválido.');
-          console.log('ConsultaForm - formData.dataConsulta antes de onSubmit:', formData.dataConsulta);
+        // Validação completa, agora com planoId de volta
+        if (!formData.planoId || !formData.profissionalSaudeId || !formData.peso || !formData.altura) {
+          setFormValidationErrors('Por favor, preencha todos os campos obrigatórios (ID do Paciente, ID do Profissional, Peso, Altura).');
           return;
         }
     }
 
     try {
-      await onFormSubmit(formData); // Chama a função de submissão do pai
+      await onFormSubmit(formData);
     } catch (error: any) {
-      // Erro já será propagado e exibido via 'apiError' prop
-      console.error("Erro na submissão do formulário (interno):", error);
+      console.error("Erro na submissão do formulário:", error);
     }
   };
 
@@ -80,21 +104,7 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
   const isEditMode = mode === 'edit';
   const isCreateMode = mode === 'create';
 
-  const camposMedidas = [
-    { label: 'Tórax (cm)', name: 'torax', value: formData.torax },
-    { label: 'Abdômen (cm)', name: 'abdomen', value: formData.abdomen },
-    { label: 'Cintura (cm)', name: 'cintura', value: formData.cintura },
-    { label: 'Quadril (cm)', name: 'quadril', value: formData.quadril },
-    { label: 'Braço Esquerdo (cm)', name: 'bracoEsquerdo', value: formData.bracoEsquerdo },
-    { label: 'Braço Direito (cm)', name: 'bracoDireito', value: formData.bracoDireito },
-    { label: 'Antebraço Esquerdo (cm)', name: 'antibracoEsquerdo', value: formData.antibracoEsquerdo },
-    { label: 'Antebraço Direito (cm)', name: 'antibracoDireito', value: formData.antibracoDireito },
-    { label: 'Coxa Esquerda (cm)', name: 'coxaEsquerda', value: formData.coxaEsquerda },
-    { label: 'Coxa Direita (cm)', name: 'coxaDireita', value: formData.coxaDireita },
-    { label: 'Panturrilha Esquerda (cm)', name: 'panturrilhaEsquerda', value: formData.panturrilhaEsquerda },
-    { label: 'Panturrilha Direita (cm)', name: 'panturrilhaDireita', value: formData.panturrilhaDireita },
-    { label: 'Pescoço (cm)', name: 'pescoco', value: formData.pescoco },
-  ];
+  const camposMedidas: [] = [];
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -104,7 +114,7 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
         </div>
       )}
 
-      {/* Campos de ID do Paciente e Profissional */}
+      {/* Campo de ID do Paciente (planoId) - AGORA VISÍVEL NOVAMENTE E CONDICIONALMENTE DESABILITADO */}
       <div className={styles.formGridTwoCols}>
         <div>
           <label htmlFor="planoId" className={styles.label}>
@@ -117,11 +127,12 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
             value={formData.planoId}
             onChange={handleChange}
             required={!isViewMode}
-            disabled={isViewMode}
+            disabled={isViewMode || userType === "Paciente"} // Paciente não digita, seu planoId vem do contexto
             className={styles.input}
-            placeholder="UUID do Paciente"
+            placeholder={userType === "Paciente" ? "Seu ID de Plano" : "ID do Paciente para agendamento"}
           />
         </div>
+        {/* Campo de ID do Profissional */}
         <div>
           <label htmlFor="profissionalSaudeId" className={styles.label}>
             ID do Profissional {mode !== 'view' && <span className={styles.requiredIndicator}>*</span>}
@@ -133,32 +144,15 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
             value={formData.profissionalSaudeId}
             onChange={handleChange}
             required={!isViewMode}
-            disabled={isViewMode}
+            disabled={isViewMode || (userType === "Nutricionista" || userType === "EducadorFisico")} // Profissional não digita o próprio ID
             className={styles.input}
-            placeholder="UUID do Profissional"
+            placeholder={(userType === "Nutricionista" || userType === "EducadorFisico") ? "Seu ID" : "ID do Profissional"}
           />
         </div>
       </div>
 
-      {/* Campo de Data e Hora da Consulta */}
-      <div>
-        <label htmlFor="dataConsulta" className={styles.label}>
-          Data e Hora da Consulta {mode !== 'view' && <span className={styles.requiredIndicator}>*</span>}
-        </label>
-        <input
-          type="datetime-local"
-          id="dataConsulta"
-          name="dataConsulta"
-          value={formData.dataConsulta}
-          onChange={handleChange}
-          required={!isViewMode}
-          disabled={isViewMode}
-          className={styles.input}
-        />
-      </div>
-
-      {/* Campos de Peso, Altura, Refeições */}
-      <div className={styles.formGridThreeCols}>
+      {/* Campos de Peso e Altura (permanecem) */}
+      <div className={styles.formGridTwoCols}>
         <div>
           <label htmlFor="peso" className={styles.label}>
             Peso (kg) {mode !== 'view' && <span className={styles.requiredIndicator}>*</span>}
@@ -195,78 +189,19 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
             placeholder="Ex: 175"
           />
         </div>
-        <div>
-          <label htmlFor="numeroRefeicoes" className={styles.label}>
-            Nº de Refeições {mode !== 'view' && <span className={styles.requiredIndicator}>*</span>}
-          </label>
-          <input
-            type="number"
-            id="numeroRefeicoes"
-            name="numeroRefeicoes"
-            value={formData.numeroRefeicoes}
-            onChange={handleChange}
-            required={!isViewMode}
-            disabled={isViewMode}
-            step="1"
-            min="1"
-            className={styles.input}
-            placeholder="Ex: 5"
-          />
-        </div>
-      </div>
-
-      {/* Seção de Medidas Corporais */}
-      <h3 className={styles.sectionTitle}>Medidas Corporais (Opcional)</h3>
-      <div className={styles.formGridMeasures}>
-        {camposMedidas.map(campo => (
-          <div key={campo.name}>
-            <label htmlFor={campo.name} className={styles.label}>
-              {campo.label}
-            </label>
-            <input
-              type="number"
-              id={campo.name}
-              name={campo.name}
-              value={campo.value}
-              onChange={handleChange}
-              disabled={isViewMode}
-              step="0.1"
-              min="0"
-              className={styles.input}
-              placeholder="Opcional"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Campo de Observações Adicionais */}
-      <div>
-        <label htmlFor="observacoes" className={styles.label}>
-          Observações Adicionais:
-        </label>
-        <textarea
-          id="observacoes"
-          name="observacoes"
-          value={formData.observacoes}
-          onChange={handleChange}
-          disabled={isViewMode}
-          className={styles.textarea}
-          rows={3}
-          placeholder="Outras observações relevantes sobre a consulta..."
-        ></textarea>
       </div>
 
       {/* Botões de Ação do formulário */}
       <div className={styles.buttonGroup}>
         <button
           type="button"
-          onClick={onCancel} // Chama o onCancel passado via props
+          onClick={onCancel}
           disabled={isLoading}
           className={`${styles.button} ${styles.buttonSecondary}`}
         >
           Cancelar
         </button>
-        {mode !== 'view' && ( // Só mostra o botão de submissão se não for modo 'view'
+        {mode !== 'view' && (
           <button
             type="submit"
             disabled={isLoading}
@@ -275,11 +210,11 @@ const ConsultaForm: React.FC<ConsultaFormProps> = ({
             {isLoading ? (isCreateMode ? 'Criando...' : 'Salvando...') : (isCreateMode ? 'Criar Consulta' : 'Salvar Alterações')}
           </button>
         )}
-        {isViewMode && ( // Adiciona um botão de edição no modo de visualização
+        {isViewMode && (
           <button
             type="button"
-            onClick={() => { /* Lógica para mudar para o modo de edição no pai */ }} // Apenas um placeholder, o pai vai lidar com isso
-            className={`${styles.button} ${styles.buttonPrimary}`} // Pode ser uma cor diferente, ex: styles.buttonEdit
+            onClick={() => onEditRequest && onEditRequest(formData)}
+            className={`${styles.button} ${styles.buttonPrimary}`}
           >
             Editar
           </button>

@@ -1,0 +1,58 @@
+/* src/pages/PlanoPage.module.css */
+
+.selectInput {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.selectInput:focus {
+  outline: none;
+  border-color: #007bff; /* Ou a cor que você preferir para foco */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.selectInput:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Mantenha suas outras classes como formGroup e loadingSpinner */
+.formGroup {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.formGroup p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.formGroup label {
+  display: inline-block; /* Altere para inline-block para o label do select */
+  margin-right: 0.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.loadingSpinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    font-size: 1.2em;
+    vertical-align: middle;
+    margin-left: 0.5em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

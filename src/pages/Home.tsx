@@ -21,7 +21,7 @@ export default function Home() {
 
       <section style={{ marginTop: "2rem" }}>
         <button onClick={() => navigate("/Perfil")} style={btnStyle}>Editar Perfil</button>
-        <button onClick={() => navigate("/Plano")} style={btnStyle}>Ver Planos</button>
+        <button onClick={() => navigate("/PlanoPage")} style={btnStyle}>Ver Planos</button>
         <button onClick={() => navigate("/Consultas")} style={btnStyle}>Ver Consultas</button>
       </section>
 

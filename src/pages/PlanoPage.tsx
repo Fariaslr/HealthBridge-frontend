@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // Use o AuthContext
+import { useAuth } from "../context/AuthContext"; 
 import { criarPlano } from "../services/planoService";
-import { Modal } from "../components/ModalPlano"; // Presumindo que 'ModalPlano' é seu modal genérico ou específico
+import { Modal } from "../components/ModalPlano"; 
 
 export default function PlanoPage() {
-  // Obtenha os estados do AuthContext
   const { usuario, planoUsuario, carregarPlanoUsuario, isPlanoLoading, planoInexistente, isAuthReady } = useAuth(); // Importe isAuthReady também
 
   const [modalAberto, setModalAberto] = useState(false);
@@ -12,7 +11,7 @@ export default function PlanoPage() {
     objetivo: "",
     nivelAtividadeFisica: "",
   });
-  const [criando, setCriando] = useState(false); // Estado para o loading do formulário de criação
+  const [criando, setCriando] = useState(false);
 
   const abrirModal = () => setModalAberto(true);
   const fecharModal = () => setModalAberto(false);

@@ -87,7 +87,6 @@ export default function ConsultaPage() {
   }, [isAuthenticated, isAuthReady, usuario, planoUsuario, isPlanoLoading, planoInexistente, carregarConsultas]);
 
   const abrirModal = (mode: 'create' | 'edit' | 'view', consulta?: Consulta) => {
-    // Prevenir abertura do modal de criação/edição para Paciente sem plano
     if (mode !== 'view' && usuario?.tipoUsuario === "Paciente" && !planoUsuario) {
         setApiErrorSubmit("Você precisa ter um plano associado para criar/editar consultas.");
         return;

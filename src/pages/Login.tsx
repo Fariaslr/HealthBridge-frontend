@@ -17,7 +17,7 @@ export default function Login() {
       const user = (await login(email, senha)) as Pessoa;
       setUsuario(user);
       setErro("");
-      navigate("/home"); // redireciona para a home após login
+      navigate("/home");
       console.log(user.tipoUsuario)
     } catch (err: any) {
       setErro(err.message || "Erro ao fazer login");
@@ -59,7 +59,6 @@ export default function Login() {
   );
 }
 
-// Estilos
 const containerStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",

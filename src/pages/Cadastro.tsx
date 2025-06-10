@@ -6,13 +6,13 @@ import type { PessoaBaseInput, TipoCadastro } from "../types/cadastroTypes";
 
 const initialSimplifiedState: PessoaBaseInput = {
   nome: "",
-  sobrenome: "SobrenomeTeste",
+  sobrenome: "",
   email: "",
   senha: "",
   telefone: "99999999999",
   cpf: "11122233344",
-  dataNascimento: "2000-01-01", // Formato YYYY-MM-DD
-  sexo: "NAO_INFORMADO", // Ou "MASCULINO", "FEMININO"
+  dataNascimento: "2000-01-01",
+  sexo: "NAO_INFORMADO", 
   cep: "12345-678",
   numero: "123",
   complemento: "Apto 101",

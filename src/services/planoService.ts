@@ -1,4 +1,3 @@
-// src/services/planoService.ts
 import axios from "axios";
 import type { Plano } from "../models/Plano";
 

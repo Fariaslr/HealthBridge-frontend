@@ -15,6 +15,42 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
         <button style={closeBtnStyle} onClick={onClose}>
           ✖
         </button>
+        <h3>Criar novo plano</h3>
+        <label>
+          Objetivo:
+          <select
+            name="objetivo"
+            value={novoPlano.objetivo}
+            onChange={handleChangeSelectCriacao}
+            style={{ marginLeft: 10 }}
+          >
+            <option value="">Selecione</option>
+            <option value="EMAGRECIMENTO">Emagrecimento</option>
+            <option value="MANUTENCAO">Manutenção do peso</option>
+            <option value="HIPERTROFIA">Hipertrofia</option>
+          </select>
+        </label>
+        <br />
+        <label>
+          Nível de Atividade Física:
+          <select
+            name="nivelAtividadeFisica"
+            value={novoPlano.nivelAtividadeFisica}
+            onChange={handleChangeSelectCriacao}
+            style={{ marginLeft: 10 }}
+          >
+            <option value="">Selecione</option>
+            <option value="SEDENTARIO">Sedentário</option>
+            <option value="LEVEMENTE_ATIVO">Levemente ativo</option>
+            <option value="MODERADAMENTE_ATIVO">Moderadamente ativo</option>
+            <option value="ALTAMENTE_ATIVO">Altamente ativo</option>
+            <option value="EXTREMAMENTE_ATIVO">Extremamente ativo</option>
+          </select>
+        </label>
+        <br />
+        <button onClick={handleCriarPlano} disabled={criando} style={{ marginTop: "1rem" }}>
+          {criando ? "Criando..." : "Criar Plano"}
+        </button>
         {children}
       </div>
     </div>

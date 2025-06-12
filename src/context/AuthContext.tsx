@@ -15,9 +15,8 @@ import type { Nutricionista } from "../models/Nutricionista";
 import type { EducadorFisico } from "../models/EducadorFisico";
 
 import type { Plano } from "../models/Plano";
-import { buscarPlanoPorPacienteId } from "../services/planoService"; // <-- Usado aqui
+import { buscarPlanoPorPacienteId } from "../services/planoService";
 
-// Defina o tipo de usuário que o contexto pode retornar (união de tipos)
 type AuthUser =
   | Paciente
   | ProfissionalSaude
@@ -25,18 +24,16 @@ type AuthUser =
   | Nutricionista
   | EducadorFisico;
 
-// --- CORREÇÃO AQUI: Adicione carregarPlanoUsuario à interface AuthContextType ---
 type AuthContextType = {
   usuario: AuthUser | null;
   setUsuario: (user: AuthUser | null) => void;
   planoUsuario: Plano | null;
-  carregarPlanoUsuario: () => Promise<void>; // <--- ADICIONE ESTA LINHA
+  carregarPlanoUsuario: () => Promise<void>;
   isAuthenticated: boolean;
   isAuthReady: boolean;
   isPlanoLoading: boolean;
   planoInexistente: boolean;
 };
-// --- FIM DA CORREÇÃO ---
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -50,7 +47,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = !!usuario;
   const isInitialized = useRef(false);
 
-  // Inicializa o usuário com base no localStorage
   useEffect(() => {
     if (!isInitialized.current) {
       const storedUser = localStorage.getItem("usuario");
@@ -68,7 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Atualiza o estado e o localStorage do usuário
   const setUsuario = (user: AuthUser | null) => {
     if (user) {
       localStorage.setItem("usuario", JSON.stringify(user));
@@ -80,9 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUsuarioState(user);
   };
 
-  // Carrega o plano do paciente, se aplicável (memoizado com useCallback)
   const carregarPlanoUsuario = useCallback(async () => {
-    // <--- Função definida aqui
     if (
       isPlanoLoading ||
       planoUsuario ||
@@ -112,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setPlanoInexistente(false);
 
     try {
-      const planoData = await buscarPlanoPorPacienteId(usuario.id); // Acessa usuario.id com segurança
+      const planoData = await buscarPlanoPorPacienteId(usuario.id);
       if (planoData) {
         setPlanoUsuario(planoData);
         setPlanoInexistente(false);
@@ -126,9 +119,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsPlanoLoading(false);
     }
-  }, [usuario, isPlanoLoading, planoUsuario, planoInexistente]); // Dependências do useCallback
+  }, [usuario, isPlanoLoading, planoUsuario, planoInexistente]);
 
-  // Dispara o carregamento do plano automaticamente (useEffect)
   useEffect(() => {
     if (
       isAuthReady &&

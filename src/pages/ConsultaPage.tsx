@@ -10,7 +10,6 @@ import {
 } from "../services/consultaService";
 import styles from "./ConsultaPage.module.css";
 import type { Consulta } from "../models/Consulta";
-import ModalBase from "../components/ModalBase";
 import ConsultaForm, { type ConsultaFormData } from "../components/ConsultaForm";
 import ConsultaDetail from "../components/ConsultaDetail";
 
@@ -359,17 +358,6 @@ export default function ConsultaPage() {
         </div>
       )}
 
-      <ModalBase
-        isOpen={isModalOpen}
-        onClose={fecharModal}
-        title={
-            modalMode === 'create' ? 'Agendar Nova Consulta' :
-            modalMode === 'edit' ? 'Editar Consulta' :
-            'Detalhes da Consulta'
-        }
-      >
-        {getModalContent()}
-      </ModalBase>
     </div>
   );
 }

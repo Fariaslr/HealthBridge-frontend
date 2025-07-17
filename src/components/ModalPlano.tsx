@@ -84,12 +84,6 @@ export function ModalPlano({
     }
   };
 
-  // Não renderiza o modal se isOpen for false
-  if (!isOpen) {
-    console.log("ModalPlano: Não renderizando (isOpen é false).");
-    return null;
-  }
-  
   // Log para confirmar que o modal está prestes a renderizar o JSX
   console.log("ModalPlano: Começando a renderizar conteúdo do modal.");
 
@@ -99,9 +93,85 @@ export function ModalPlano({
   const isPacienteUsuario = userType === "Paciente";
   const isProfissionalUsuario = userType === "Nutricionista" || userType === "EducadorFisico";
 
+  // --- Estilos Inline Dinâmicos para o Modal ---
+  // O backdropStyle e modalContentStyle agora dependem de `isOpen` para controlar a visibilidade e transições
+  const backdropStyle: React.CSSProperties = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 9999, // Z-index alto para ficar acima de outros elementos
+    opacity: isOpen ? 1 : 0, // Controla a opacidade
+    visibility: isOpen ? 'visible' : 'hidden', // Controla a visibilidade
+    transition: "opacity 0.3s ease-out, visibility 0.3s ease-out", // Transição suave
+  };
+
+  const modalContentStyle: React.CSSProperties = {
+    backgroundColor: "#fff",
+    padding: "1.5rem",
+    borderRadius: "8px",
+    minWidth: "350px",
+    maxWidth: "500px",
+    position: "relative",
+    color: "#333",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    transform: isOpen ? "translateY(0)" : "translateY(-20px)", // Transição de movimento
+    opacity: isOpen ? 1 : 0, // Transição de opacidade para o conteúdo
+    transition: "transform 0.3s ease-out, opacity 0.3s ease-out", // Transição suave
+  };
+
+  const closeBtnStyle: React.CSSProperties = {
+    position: "absolute", top: "0.5rem", right: "0.5rem",
+    background: "transparent", border: "none", fontSize: "1.5rem",
+    cursor: "pointer", color: "#666", padding: "0.25rem",
+  };
+
+  const errorMessageStyle: React.CSSProperties = {
+    backgroundColor: "#f8d7da", color: "#721c24", padding: "0.75rem",
+    marginBottom: "1rem", border: "1px solid #f5c6cb", borderRadius: "4px",
+  };
+
+  const formStyle: React.CSSProperties = {
+    display: "flex", flexDirection: "column", gap: "1rem",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    color: "#333", marginBottom: "0.5rem", display: "block", fontWeight: "bold",
+  };
+
+  const inputStyle: React.CSSProperties = { 
+    display: "block", width: "100%", padding: "0.5rem 0.75rem",
+    border: "1px solid #ccc", borderRadius: "4px", backgroundColor: "white",
+    color: "#333", fontSize: "1em", marginTop: "0.25rem",
+  };
+
+  const buttonGroupStyle: React.CSSProperties = {
+    display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem",
+  };
+
+  const primaryButtonStyle: React.CSSProperties = {
+    padding: "0.5rem 1rem", fontSize: "1em", fontWeight: "bold",
+    borderRadius: "4px", border: "none", backgroundColor: "#007bff",
+    color: "white", cursor: "pointer", transition: "background-color 0.2s ease-in-out",
+  };
+
+  const secondaryButtonStyle: React.CSSProperties = {
+    padding: "0.5rem 1rem", fontSize: "1em", fontWeight: "bold",
+    borderRadius: "4px", border: "1px solid #ccc", backgroundColor: "#f8f9fa",
+    color: "#333", cursor: "pointer", transition: "background-color 0.2s ease-in-out",
+  };
+
+  // O modal sempre será renderizado no DOM para permitir as transições
+  // A visibilidade é controlada pelas propriedades de estilo dinâmicas
   return (
-    <div style={backdropStyle}>
-      <div style={modalStyle}>
+    <div style={backdropStyle} onClick={onClose}>
+      <div style={modalContentStyle} onClick={e => e.stopPropagation()}>
         <button style={closeBtnStyle} onClick={onClose} disabled={isLoading}>
           ✖
         </button>
@@ -124,7 +194,7 @@ export function ModalPlano({
               onChange={handleChange}
               required 
               disabled={isLoading || isPacienteUsuario} // Desabilita se for Paciente (vem do contexto)
-              style={selectInputStyle} 
+              style={inputStyle} 
             />
           </label>
           <br />
@@ -139,7 +209,7 @@ export function ModalPlano({
               onChange={handleChange}
               required 
               disabled={isLoading || isProfissionalUsuario} // Desabilita se for Profissional (vem do contexto)
-              style={selectInputStyle} 
+              style={inputStyle} 
             />
           </label>
           <br />
@@ -152,7 +222,7 @@ export function ModalPlano({
               onChange={handleChange}
               required 
               disabled={isLoading}
-              style={selectInputStyle}
+              style={inputStyle} // Usando inputStyle para selects também
             >
               <option value="">Selecione</option>
               <option value="EMAGRECIMENTO">Emagrecimento</option>
@@ -169,7 +239,7 @@ export function ModalPlano({
               onChange={handleChange}
               required 
               disabled={isLoading}
-              style={selectInputStyle}
+              style={inputStyle} // Usando inputStyle para selects também
             >
               <option value="">Selecione</option>
               <option value="SEDENTARIO">Sedentário</option>
@@ -202,58 +272,3 @@ export function ModalPlano({
     </div>
   );
 }
-
-// --- Estilos Inline para o Modal (ajustados para melhor contraste) ---
-const backdropStyle: React.CSSProperties = {
-  position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.7)",
-  display: "flex", justifyContent: "center", alignItems: "center",
-  zIndex: 1000,
-};
-
-const modalStyle: React.CSSProperties = {
-  backgroundColor: "#fff", padding: "1.5rem", borderRadius: "8px",
-  minWidth: "350px", maxWidth: "500px", position: "relative",
-  color: "#333", boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-};
-
-const closeBtnStyle: React.CSSProperties = {
-  position: "absolute", top: "0.5rem", right: "0.5rem",
-  background: "transparent", border: "none", fontSize: "1.5rem",
-  cursor: "pointer", color: "#666", padding: "0.25rem",
-};
-
-const errorMessageStyle: React.CSSProperties = {
-  backgroundColor: "#f8d7da", color: "#721c24", padding: "0.75rem",
-  marginBottom: "1rem", border: "1px solid #f5c6cb", borderRadius: "4px",
-};
-
-const formStyle: React.CSSProperties = {
-    display: "flex", flexDirection: "column", gap: "1rem",
-};
-
-const labelStyle: React.CSSProperties = {
-    color: "#333", marginBottom: "0.5rem", display: "block", fontWeight: "bold",
-};
-
-const selectInputStyle: React.CSSProperties = {
-    display: "block", width: "100%", padding: "0.5rem 0.75rem",
-    border: "1px solid #ccc", borderRadius: "4px", backgroundColor: "white",
-    color: "#333", fontSize: "1em", marginTop: "0.25rem",
-};
-
-const buttonGroupStyle: React.CSSProperties = {
-    display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem",
-};
-
-const primaryButtonStyle: React.CSSProperties = {
-    padding: "0.5rem 1rem", fontSize: "1em", fontWeight: "bold",
-    borderRadius: "4px", border: "none", backgroundColor: "#007bff",
-    color: "white", cursor: "pointer", transition: "background-color 0.2s ease-in-out",
-};
-
-const secondaryButtonStyle: React.CSSProperties = {
-    padding: "0.5rem 1rem", fontSize: "1em", fontWeight: "bold",
-    borderRadius: "4px", border: "1px solid #ccc", backgroundColor: "#f8f9fa",
-    color: "#333", cursor: "pointer", transition: "background-color 0.2s ease-in-out",
-};

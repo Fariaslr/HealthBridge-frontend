@@ -1,7 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import ModalEdicao from "../components/ModalPerfil";
-import styles from "./Perfil.module.css"; // Importe os estilos
 
 export default function Perfil() {
   const { usuario, setUsuario } = useAuth();
@@ -100,4 +99,8 @@ export default function Perfil() {
       </div>
     </div>
   );
+}
+
+const styles = {
+
 }

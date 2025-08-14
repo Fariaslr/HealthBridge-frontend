@@ -2,12 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Cadastro from "./pages/Cadastro";
 import Login from "./pages/Login";
-import PlanoPage from "./pages/PlanoPage.tsx";
 import Perfil from "./pages/Perfil";
 import { useAuth } from "./context/AuthContext"; // Importe useAuth
 import Layout from "./components/Layout";
 import type { JSX } from "react";
-import ConsultaPage from "./pages/ConsultaPage.tsx";
+import Plano from "./pages/Plano.tsx";
+import Consulta from "./pages/Consulta.tsx";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { usuario, isAuthReady } = useAuth(); 
@@ -34,8 +34,8 @@ function App() {
           }
         >
           <Route path="/home" element={<Home />} />
-          <Route path="/consultas" element={<ConsultaPage />} />
-          <Route path="/planoPage" element={<PlanoPage />} />
+          <Route path="/consultas" element={<Consulta />} />
+          <Route path="/planoPage" element={<Plano />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
 

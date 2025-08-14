@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 
-export default function ConsultaPage() {
+export default function Consulta() {
   const { usuario } = useAuth();
 
   return (

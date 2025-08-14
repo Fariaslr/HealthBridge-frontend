@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ModalEdicaoProps {
-  campo: string; // Ex: 'email', 'telefone', 'endereco.numero', etc.
+  campo: string;
   valor: string | number;
   onClose: () => void;
   onSalvar: (campo: string, novoValor: string | number) => void;

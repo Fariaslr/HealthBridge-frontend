@@ -16,29 +16,19 @@ export default function Home() {
   }
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <div>
       <h1>Bem-vindo, {usuario.nome}!</h1>
 
-      <section style={{ marginTop: "2rem" }}>
-        <button onClick={() => navigate("/Perfil")} style={btnStyle}>Editar Perfil</button>
-        <button onClick={() => navigate("/PlanoPage")} style={btnStyle}>Ver Planos</button>
-        <button onClick={() => navigate("/Consultas")} style={btnStyle}>Ver Consultas</button>
+      <section >
+        <button onClick={() => navigate("/Perfil")} >Editar Perfil</button>
+        <button onClick={() => navigate("/PlanoPage")} >Ver Planos</button>
+        <button onClick={() => navigate("/Consultas")} >Ver Consultas</button>
       </section>
 
-      <button onClick={handleLogout} style={{ ...btnStyle, backgroundColor: "#c0392b", marginTop: "2rem" }}>
+      <button onClick={handleLogout}>
         Sair
       </button>
     </div>
   );
 }
 
-const btnStyle = {
-  padding: "0.5rem 1rem",
-  marginRight: "1rem",
-  marginTop: "0.5rem",
-  border: "none",
-  backgroundColor: "#3498db",
-  color: "white",
-  borderRadius: "5px",
-  cursor: "pointer"
-};

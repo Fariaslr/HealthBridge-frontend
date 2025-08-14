@@ -4,17 +4,13 @@ export default function ConsultaPage() {
   const { usuario } = useAuth();
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Minhas Consultas</h1>
+    <div >
+      <h2>Minhas Consultas</h2>
       {(usuario?.tipoUsuario === "Paciente" || usuario?.tipoUsuario === "Nutricionista" || usuario?.tipoUsuario === "EducadorFisico") && (
-        <button onClick={() =>("")} className={styles.createButton}>
-          Agendar Nova Consulta
+        <button onClick={() =>(console.log("Botão de agendamento clicado!"))}>
+          Clique aqui
         </button>
       )}
     </div>
   );
-}
-
-const styles = {
-
 }

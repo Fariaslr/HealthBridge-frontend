@@ -8,8 +8,8 @@ export default function Perfil() {
 
   if (!usuario) {
     return (
-      <div className={styles.loadingContainer}>
-        <p className={styles.loadingText}>Carregando perfil ou usuário não autenticado.</p>
+      <div>
+        <p >Carregando perfil ou usuário não autenticado.</p>
       </div>
     );
   }
@@ -56,21 +56,21 @@ export default function Perfil() {
   };
 
   const renderItem = (label: string, campo: string) => (
-    <div className={styles.infoItem}> {/* Usando className */}
-      <span className={styles.label}>{label}:</span> {/* Usando className */}
-      <span className={styles.value}>{obterValorAtual(campo)}</span> {/* Usando className */}
-      <button onClick={() => abrirModal(campo)} className={styles.editIcon}> {/* Usando className */}
+    <div > 
+      <span >{label}:</span> 
+      <span >{obterValorAtual(campo)}</span> 
+      <button onClick={() => abrirModal(campo)} > 
         ✏️
       </button>
     </div>
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.profileCard}>
-        <h2 className={styles.title}>Meu Perfil</h2>
+    <div >
+      <div >
+        <h2>Meu Perfil</h2>
 
-        <div className={styles.infoGroup}>
+        <div>
           {renderItem("Nome Completo", "nome")}
           {renderItem("Sobrenome", "sobrenome")}
           {renderItem("Email", "email")}
@@ -81,8 +81,8 @@ export default function Perfil() {
           {renderItem("Tipo de Usuário", "tipoUsuario")}
         </div>
 
-        <h3 className={styles.sectionTitle}>Endereço</h3>
-        <div className={styles.infoGroup}>
+        <h3 >Endereço</h3>
+        <div >
           {renderItem("CEP", "endereco.cep")}
           {renderItem("Número", "endereco.numero")}
           {renderItem("Complemento", "endereco.complemento")}
@@ -99,8 +99,4 @@ export default function Perfil() {
       </div>
     </div>
   );
-}
-
-const styles = {
-
 }

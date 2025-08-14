@@ -22,24 +22,6 @@ export default function Perfil() {
     setCampoSelecionado(null);
   };
 
-  const obterValorAtual = (campo: string): string | number => {
-    const partes = campo.split(".");
-    let valor: any = usuario;
-
-    for (const parte of partes) {
-      if (valor === null || valor === undefined) return "N/A";
-      valor = valor[parte];
-    }
-
-    if (campo.includes("dataNascimento") && valor) {
-      try {
-        return new Date(valor).toLocaleDateString('pt-BR');
-      } catch (e) {
-        return valor;
-      }
-    }
-    return valor || "N/A";
-  };
 
   const salvarValor = (campo: string, novoValor: string | number) => {
     const partes = campo.split(".");
@@ -58,7 +40,7 @@ export default function Perfil() {
   const renderItem = (label: string, campo: string) => (
     <div > 
       <span >{label}:</span> 
-      <span >{obterValorAtual(campo)}</span> 
+      <span >{" " + campo}</span> 
       <button onClick={() => abrirModal(campo)} > 
         ✏️
       </button>
@@ -71,14 +53,14 @@ export default function Perfil() {
         <h2>Meu Perfil</h2>
 
         <div>
-          {renderItem("Nome Completo", "nome")}
-          {renderItem("Sobrenome", "sobrenome")}
-          {renderItem("Email", "email")}
-          {renderItem("CPF", "cpf")}
-          {renderItem("Telefone", "telefone")}
-          {renderItem("Gênero", "sexo")}
-          {renderItem("Data de Nascimento", "dataNascimento")}
-          {renderItem("Tipo de Usuário", "tipoUsuario")}
+          {renderItem("CPF", usuario.cpf)}
+          {renderItem("Nome Completo", usuario.nome)}
+          {renderItem("Sobrenome", usuario.sobrenome)}
+          {renderItem("Email", usuario.email)}          
+          {renderItem("Telefone", usuario.telefone)}
+          {renderItem("Gênero", usuario.sexo)}
+          {renderItem("Data de Nascimento", usuario.dataNascimento)}
+          {renderItem("Tipo de Usuário", usuario.tipoUsuario)}
         </div>
 
         <h3 >Endereço</h3>
@@ -91,7 +73,7 @@ export default function Perfil() {
         {campoSelecionado && (
           <ModalEdicao
             campo={campoSelecionado}
-            valor={obterValorAtual(campoSelecionado)}
+            valor={campoSelecionado}
             onClose={fecharModal}
             onSalvar={salvarValor}
           />

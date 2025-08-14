@@ -10,7 +10,6 @@ import styles from "./PlanoPage.module.css";
 
 export default function PlanoPage() {
   const { usuario, planoUsuario, carregarPlanoUsuario, isPlanoLoading, planoInexistente, isAuthReady } = useAuth(); // Importe isAuthReady também
-  const { usuario, planoUsuario, carregarPlanoUsuario, isPlanoLoading, planoInexistente, isAuthReady } = useAuth();
 
   const [modalAberto, setModalAberto] = useState(false);
   const [novoPlano, setNovoPlano] = useState({
@@ -69,7 +68,7 @@ export default function PlanoPage() {
   const handleCriarPlano = async () => {
     if (!usuario || !usuario.id) return alert("Usuário não autenticado");
 
-@@ -35,12 +75,11 @@ export default function PlanoPage() {
+ export default function PlanoPage() {
         pacienteId: usuario.id,
         objetivo: novoPlano.objetivo,
         nivelAtividadeFisica: novoPlano.nivelAtividadeFisica,
@@ -83,7 +82,7 @@ export default function PlanoPage() {
       await carregarPlanoUsuario();
       alert("Plano criado com sucesso!");
       setNovoPlano({ objetivo: "", nivelAtividadeFisica: "" });
-@@ -53,73 +92,113 @@ export default function PlanoPage() {
+ export default function PlanoPage() {
     }
   };
 

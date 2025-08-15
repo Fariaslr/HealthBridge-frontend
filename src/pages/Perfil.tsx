@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import ModalEdicao from "../components/ModalPerfil";
+import InfoItem from "../components/InfoItem";
 
 export default function Perfil() {
   const { usuario, setUsuario } = useAuth();
@@ -13,6 +14,25 @@ export default function Perfil() {
       </div>
     );
   }
+
+  const obterValorAtual = (campo: string): string | number => {
+    const partes = campo.split(".");
+    let valor: any = usuario;
+
+    for (const parte of partes) {
+      if (valor === null || valor === undefined) return "N/A";
+      valor = valor[parte];
+    }
+
+    if (campo.includes("dataNascimento") && valor) {
+      try {
+        return new Date(valor).toLocaleDateString('pt-BR');
+      } catch (e) {
+        return valor;
+      }
+    }
+    return valor || "N/A";
+  };
 
   const abrirModal = (campo: string) => {
     setCampoSelecionado(campo);
@@ -37,43 +57,29 @@ export default function Perfil() {
     fecharModal();
   };
 
-  const renderItem = (label: string, campo: string) => (
-    <div > 
-      <span >{label}:</span> 
-      <span >{" " + campo}</span> 
-      <button onClick={() => abrirModal(campo)} > 
-        ✏️
-      </button>
-    </div>
-  );
 
   return (
     <div >
       <div >
         <h2>Meu Perfil</h2>
+        <InfoItem
+            label="Nome Completo"
+            value={usuario.nome + " " + usuario.sobrenome}
+            onEdit={() => abrirModal("nome")}
+          />
 
-        <div>
-          {renderItem("CPF", usuario.cpf)}
-          {renderItem("Nome Completo", usuario.nome)}
-          {renderItem("Sobrenome", usuario.sobrenome)}
-          {renderItem("Email", usuario.email)}          
-          {renderItem("Telefone", usuario.telefone)}
-          {renderItem("Gênero", usuario.sexo)}
-          {renderItem("Data de Nascimento", usuario.dataNascimento)}
-          {renderItem("Tipo de Usuário", usuario.tipoUsuario)}
-        </div>
-
+          <InfoItem
+            label="Cpf"
+            value={usuario.cpf }
+            onEdit={() => abrirModal("cpf")}
+          />
         <h3 >Endereço</h3>
-        <div >
-          {renderItem("CEP", "endereco.cep")}
-          {renderItem("Número", "endereco.numero")}
-          {renderItem("Complemento", "endereco.complemento")}
-        </div>
+        
 
         {campoSelecionado && (
           <ModalEdicao
             campo={campoSelecionado}
-            valor={campoSelecionado}
+            valor={obterValorAtual(campoSelecionado)}
             onClose={fecharModal}
             onSalvar={salvarValor}
           />

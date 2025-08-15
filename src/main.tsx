@@ -1,5 +1,3 @@
-import 'normalize.css'; // <--- Adicione esta linha AQUI
-import "./index.css"; // Seus estilos globais (devem vir depois do normalize)
 import App from "./App.tsx";
 import React from "react";
 import ReactDOM from "react-dom/client";

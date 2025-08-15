@@ -5,9 +5,9 @@ export default function Header() {
     <header style={headerStyle}>
       <nav style={navStyle}>
         <Link to="/home" style={linkStyle}>Home</Link>
-        <Link to="/perfil" style={linkStyle}>Perfil</Link>
         <Link to="/planoPage" style={linkStyle}>Plano</Link>
         <Link to="/consultas" style={linkStyle}>Consultas</Link>
+        <Link to="/perfil" style={linkStyle}>Perfil</Link>
         <Link to="/login" style={linkStyle}>Sair</Link>
       </nav>
     </header>
@@ -21,7 +21,6 @@ const headerStyle: React.CSSProperties = {
   backgroundColor: "#333",
   color: "#fff",
   padding: "1rem",
-  zIndex: 1000,
 };
 
 const navStyle: React.CSSProperties = {

@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Cadastro from "./pages/Cadastro";
 import Login from "./pages/Login";
 import Perfil from "./pages/Perfil";
-import { useAuth } from "./context/AuthContext"; // Importe useAuth
+import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import type { JSX } from "react";
 import Plano from "./pages/Plano.tsx";

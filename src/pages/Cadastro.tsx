@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { cadastrarUsuario } from "../services/authService";
 import type { PessoaBaseInput, TipoCadastro } from "../types/cadastroTypes";
 
-
 const initialSimplifiedState: PessoaBaseInput = {
   nome: "",
   sobrenome: "",
@@ -12,11 +11,13 @@ const initialSimplifiedState: PessoaBaseInput = {
   telefone: "99999999999",
   cpf: "11122233344",
   dataNascimento: "2000-01-01",
-  sexo: "NAO_INFORMADO", 
-  cep: "12345-678",
-  numero: "123",
-  complemento: "Apto 101",
+  sexo: "NAO_INFORMADO",
+  cep: "",
+  numero: "",
+  complemento: "",
 };
+
+const [confirmarSenha, setConfirmarSenha] = useState("");
 
 export default function Cadastro() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export default function Cadastro() {
   ) => {
     const newType = e.target.value as TipoCadastro;
     setTipoCadastro(newType);
-    setFormData(initialSimplifiedState); // Reinicia com os valores padrão simplificados
+    setFormData(initialSimplifiedState);
     setErro("");
   };
 
@@ -59,7 +60,9 @@ export default function Cadastro() {
       if (!formData.senha.trim()) {
         throw new Error("A senha é obrigatória.");
       }
-
+      if (formData.senha !== confirmarSenha) {
+        throw new Error("As senhas não coincidem."); // Validação adicionada
+      }
       if (tipoCadastro === "EDUCADOR_FISICO" && !formData.cref?.trim()) {
         throw new Error("O CREF é obrigatório para Educador Físico.");
       }
@@ -82,15 +85,18 @@ export default function Cadastro() {
   return (
     <div style={containerStyle}>
       <form onSubmit={handleCadastro} style={formStyle} autoComplete="off">
-        <h2 style={titleStyle}>Cadastro Simplificado</h2>
+        <h2 style={titleStyle}>Cadastro</h2>
 
+        {/* Seleção do Tipo de Cadastro */}
         <div style={{ marginBottom: "1rem" }}>
-          <label htmlFor="tipoCadastro">Sou um(a):</label>
+          <label htmlFor="tipoCadastro" style={labelStyle}>
+            Sou um(a):
+          </label>
           <select
             id="tipoCadastro"
             value={tipoCadastro}
             onChange={handleTipoCadastroChange}
-            style={{ ...inputStyle, marginLeft: 10, width: "auto" }}
+            style={selectStyle}
           >
             <option value="PACIENTE">Paciente</option>
             <option value="EDUCADOR_FISICO">Educador Físico</option>
@@ -98,15 +104,123 @@ export default function Cadastro() {
           </select>
         </div>
 
-        <input
-          type="text"
-          placeholder="Nome"
-          name="nome"
-          value={formData.nome}
-          onChange={handleChange}
-          required
-          style={inputStyle}
-        />
+        {/* Divisão 1: Informações Pessoais */}
+        <h3 style={sectionTitleStyle}>Informações Pessoais</h3>
+        <div style={formRowStyle}>
+          <div style={formGroupStyle}>
+            <label htmlFor="nome" style={labelStyle}>
+              Nome
+            </label>
+            <input
+              id="nome"
+              type="text"
+              name="nome"
+              placeholder="João"
+              value={formData.nome}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+          <div style={formGroupStyle}>
+            <label htmlFor="sobrenome" style={labelStyle}>
+              Sobrenome
+            </label>
+            <input
+              id="sobrenome"
+              type="text"
+              name="sobrenome"
+              placeholder="Silva"
+              value={formData.sobrenome}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+        </div>
+        <div style={formRowStyle}>
+          <div style={formGroupStyle}>
+            <label htmlFor="dataNascimento" style={labelStyle}>
+              Data de Nascimento
+            </label>
+            <input
+              id="dataNascimento"
+              type="date"
+              name="dataNascimento"
+              value={formData.dataNascimento}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+          <div style={formGroupStyle}>
+            <label htmlFor="sexo" style={labelStyle}>
+              Sexo
+            </label>
+            <select
+              id="sexo"
+              name="sexo"
+              value={formData.sexo}
+              onChange={handleChange}
+              style={inputStyle}
+            >
+              <option value="NAO_INFORMADO">Não Informado</option>
+              <option value="MASCULINO">Masculino</option>
+              <option value="FEMININO">Feminino</option>
+              <option value="OUTRO">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <h3 style={sectionTitleStyle}>Endereço</h3>
+        <div style={formRowStyle}>
+          <div style={formGroupStyle}>
+            <label htmlFor="cep" style={labelStyle}>
+              CEP
+            </label>
+            <input
+              id="cep"
+              type="text"
+              name="cep"
+              placeholder="42000-000"
+              value={formData.cep}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+          <div style={formGroupStyle}>
+            <label htmlFor="numero" style={labelStyle}>
+              Número
+            </label>
+            <input
+              id="numero"
+              type="text"
+              name="numero"
+              placeholder="Ex. 123"
+              value={formData.numero}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+            />
+          </div>
+        </div>
+        <div style={formGroupStyle}>
+          <label htmlFor="complemento" style={labelStyle}>
+            Complemento
+          </label>
+          <input
+            id="complemento"
+            type="text"
+            name="complemento"
+            placeholder="Apto, Bloco, etc."
+            value={formData.complemento}
+            onChange={handleChange}
+            style={inputStyle}
+          />
+        </div>
+
+        <h3 style={sectionTitleStyle}>Dados de Acesso</h3>
         <input
           type="email"
           placeholder="Email"
@@ -115,7 +229,7 @@ export default function Cadastro() {
           onChange={handleChange}
           required
           style={inputStyle}
-          autoComplete="new-email"
+          autoComplete="email"
         />
         <input
           type="password"
@@ -128,28 +242,56 @@ export default function Cadastro() {
           autoComplete="new-password"
         />
 
-        {tipoCadastro === "EDUCADOR_FISICO" && (
-          <input
-            type="text"
-            placeholder="CREF"
-            name="cref"
-            value={formData.cref || ""}
-            onChange={handleChange}
-            required
-            style={inputStyle}
-          />
-        )}
+        <input
+          type="password"
+          placeholder="Confirmar Senha"
+          name="confirmarSenha"
+          value={confirmarSenha}
+          onChange={handleChange}
+          required
+          style={inputStyle}
+        />
 
-        {tipoCadastro === "NUTRICIONISTA" && (
-          <input
-            type="text"
-            placeholder="CRN"
-            name="crn"
-            value={formData.crn || ""}
-            onChange={handleChange}
-            required
-            style={inputStyle}
-          />
+        {/* Campos Condicionais */}
+        {(tipoCadastro === "EDUCADOR_FISICO" ||
+          tipoCadastro === "NUTRICIONISTA") && (
+          <>
+            <h3 style={sectionTitleStyle}>Informações Profissionais</h3>
+            <div style={formRowStyle}>
+              {tipoCadastro === "EDUCADOR_FISICO" && (
+                <div style={formGroupStyle}>
+                  <label htmlFor="cref" style={labelStyle}>
+                    CREF
+                  </label>
+                  <input
+                    id="cref"
+                    type="text"
+                    name="cref"
+                    value={formData.cref || ""}
+                    onChange={handleChange}
+                    required
+                    style={inputStyle}
+                  />
+                </div>
+              )}
+              {tipoCadastro === "NUTRICIONISTA" && (
+                <div style={formGroupStyle}>
+                  <label htmlFor="crn" style={labelStyle}>
+                    CRN
+                  </label>
+                  <input
+                    id="crn"
+                    type="text"
+                    name="crn"
+                    value={formData.crn || ""}
+                    onChange={handleChange}
+                    required
+                    style={inputStyle}
+                  />
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         <button type="submit" style={buttonStyle} disabled={loading}>
@@ -171,9 +313,10 @@ const containerStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  height: "100vh",
+  minHeight: "100vh",
   width: "100vw",
   backgroundColor: "#f0f2f5",
+  padding: "20px 0",
 };
 
 const formStyle: React.CSSProperties = {
@@ -182,17 +325,36 @@ const formStyle: React.CSSProperties = {
   borderRadius: "8px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   minWidth: "320px",
-  maxWidth: "400px",
+  maxWidth: "600px",
   width: "100%",
   display: "flex",
   flexDirection: "column",
   gap: "1rem",
 };
 
+const formRowStyle: React.CSSProperties = {
+  display: "flex",
+  gap: "1rem",
+};
+
+const formGroupStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  flex: 1,
+};
+
 const titleStyle: React.CSSProperties = {
-  marginBottom: "1.5rem",
+  marginBottom: "1rem",
   textAlign: "center",
   color: "#333",
+};
+
+const sectionTitleStyle: React.CSSProperties = {
+  marginTop: "1rem",
+  marginBottom: "0.5rem",
+  color: "#555",
+  borderBottom: "1px solid #ddd",
+  paddingBottom: "0.5rem",
 };
 
 const inputStyle: React.CSSProperties = {
@@ -232,4 +394,16 @@ const linkStyle: React.CSSProperties = {
   color: "#28a745",
   textDecoration: "none",
   fontWeight: "bold",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontWeight: "bold",
+  color: "#333",
+  marginBottom: "0.5rem",
+};
+
+const selectStyle: React.CSSProperties = {
+  ...inputStyle,
+  marginLeft: "10px",
+  width: "auto",
 };

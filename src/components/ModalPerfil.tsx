@@ -65,7 +65,6 @@ export default function ModalEdicao({
   );
 }
 
-// Estilos do modal
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,
@@ -76,7 +75,6 @@ const overlayStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  zIndex: 999,
 };
 
 const modalStyle: React.CSSProperties = {

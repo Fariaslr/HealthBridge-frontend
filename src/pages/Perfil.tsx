@@ -65,13 +65,11 @@ export default function Perfil() {
         <InfoItem
             label="Nome Completo"
             value={usuario.nome + " " + usuario.sobrenome}
-            onEdit={() => abrirModal("nome")}
           />
 
           <InfoItem
             label="Cpf"
             value={usuario.cpf }
-            onEdit={() => abrirModal("cpf")}
           />
         <h3 >Endereço</h3>
         

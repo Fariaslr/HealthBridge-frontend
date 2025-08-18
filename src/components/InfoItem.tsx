@@ -2,19 +2,14 @@
 interface InfoItemProps {
   label: string;
   value: string | number;
-  onEdit?: () => void;
 }
 
-export default function InfoItem({ label, value, onEdit }: InfoItemProps) {
+export default function InfoItem({ label, value }: InfoItemProps) {
   return (
     <div style={styles.infoItem}>
       <span style={styles.label}>{label}:</span>
       <span style={styles.value}>{value}</span>
-      {onEdit && (
-        <button onClick={onEdit} style={styles.editIcon}>
-          ✏️
-        </button>
-      )}
+    
     </div>
   );
 }

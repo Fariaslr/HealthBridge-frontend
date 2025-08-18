@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Plano() {
   const { usuario, setUsuario } = useAuth();
+
   const [campoSelecionado, setCampoSelecionado] = useState<string | null>(null);
 
   const abrirModal = (campo: string) => {
@@ -18,7 +19,6 @@ export default function Plano() {
     return (
       <div >
         <p>Nenhum plano encontrado ou usuário não autenticado.</p>
-        <button>Criar Plano</button>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export default function Plano() {
       <h2>Plano</h2>
       <InfoItem
         label="Objetivo"
-        value={usuario.plano?.objetivo}
+        value={plano?.objetivo}
         onEdit={() => abrirModal("nome")}
       />
     </div>

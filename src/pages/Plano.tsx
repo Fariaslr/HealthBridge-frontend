@@ -26,11 +26,6 @@ export default function Plano() {
   return (
     <div>
       <h2>Plano</h2>
-      <InfoItem
-        label="Objetivo"
-        value={plano?.objetivo}
-        onEdit={() => abrirModal("nome")}
-      />
     </div>
   );
 };

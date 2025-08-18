@@ -1,54 +1,80 @@
-# React + TypeScript + Vite
+# Health&Bridge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### 👩‍⚕️ Conectando Nutricionistas e Educadores Físicos a Pacientes em uma única plataforma.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 📋 Visão Geral do Projeto
 
-## Expanding the ESLint configuration
+Health&Bridge é uma aplicação frontend construída com React e TypeScript que atua como uma ponte entre profissionais de saúde (Nutricionistas e Educadores Físicos) e pacientes. O sistema permite que os usuários se cadastrem, façam login e gerenciem seus perfis, visualizem seus planos de saúde e agendem consultas, proporcionando uma experiência completa e integrada.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Este projeto foi desenvolvido com foco em modularidade, reutilização de componentes e tipagem estática para garantir um código limpo, robusto e de fácil manutenção.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 💻 Tecnologias Utilizadas
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+* **Frontend:**
+    * [**React**](https://reactjs.org/): Biblioteca JavaScript para construção da interface de usuário.
+    * [**TypeScript**](https://www.typescriptlang.org/): Superset do JavaScript que adiciona tipagem estática.
+    * [**Vite**](https://vitejs.dev/): Ferramenta de build rápida e leve para projetos frontend.
+    * [**React Router DOM**](https://reactrouter.com/): Biblioteca para gerenciamento de rotas na aplicação.
+* **Estilização:**
+    * CSS Modules: Para estilos com escopo local.
+    * CSS-in-JS (objetos de estilo): Para estilos inline em componentes.
+* **Gerenciamento de Estado:**
+    * React Context API: Utilizada para gerenciar o estado global de autenticação (`AuthContext`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### ✨ Funcionalidades
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+* **Autenticação:**
+    * **Login:** Acesso seguro com e-mail e senha.
+    * **Cadastro:** Formulário dinâmico com campos de acesso, informações pessoais, profissionais (CREF/CRN) e endereço (com preenchimento automático de CEP - a ser implementado).
+* **Gestão de Perfil:**
+    * Visualização e edição de dados pessoais e de contato.
+* **Gestão de Plano:**
+    * Visualização de um plano de saúde (com renderização condicional se o plano não for nulo).
+* **Navegação:**
+    * `Header` responsivo para fácil navegação entre as páginas.
+* **UI/UX:**
+    * Formulários organizados em seções lógicas para uma melhor experiência de usuário.
+    * Componentes reutilizáveis (`InfoItem`) para padronização.
+
+### 🚀 Instalação e Execução
+
+Para rodar o projeto em seu ambiente de desenvolvimento, siga os passos abaixo.
+
+#### **Pré-requisitos**
+
+Certifique-se de ter o [Node.js](https://nodejs.org/) (versão 18 ou superior) instalado em sua máquina.
+
+#### **Passo a passo**
+
+1.  **Clone o repositório:**
+    ```bash
+    git clone [URL_DO_SEU_REPOSITORIO]
+    cd macros-frontend
+    ```
+
+2.  **Instale as dependências:**
+    ```bash
+    npm install
+    # ou
+    yarn install
+    # ou
+    pnpm install
+    ```
+
+3.  **Execute o servidor de desenvolvimento:**
+    ```bash
+    npm run dev
+    # ou
+    yarn dev
+    # ou
+    pnpm dev
+    ```
+
+4.  **Acesse a aplicação:**
+    Abra seu navegador e acesse a URL: `http://localhost:5173` (ou a porta indicada pelo seu terminal).
+
+### 📂 Estrutura do Projeto
+
+A organização do projeto segue a seguinte estrutura:

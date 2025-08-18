@@ -9,7 +9,10 @@ export default function InfoItem({ label, value }: InfoItemProps) {
     <div style={styles.infoItem}>
       <span style={styles.label}>{label}:</span>
       <span style={styles.value}>{value}</span>
+<<<<<<< HEAD
     
+=======
+>>>>>>> 6350aebb2cb5c7e657aa1885b82450a3dfcf3c6b
     </div>
   );
 }
@@ -19,16 +22,16 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '10px 0'
+    padding: '5px'
   },
   label: {
-    fontWeight: 'bold',
     color: '#333',
   },
   value: {
     flexGrow: 1,
     marginLeft: '10px',
-    color: '#666',
+    color: '#333',
+    fontWeight: 'bold'
   },
   editIcon: {
     background: 'none',

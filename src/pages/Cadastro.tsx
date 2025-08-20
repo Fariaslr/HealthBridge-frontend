@@ -17,10 +17,11 @@ const initialSimplifiedState: PessoaBaseInput = {
   complemento: "",
 };
 
-const [confirmarSenha, setConfirmarSenha] = useState("");
-
 export default function Cadastro() {
   const navigate = useNavigate();
+
+  // --- CORREÇÃO: Mova a declaração do useState para AQUI ---
+  const [confirmarSenha, setConfirmarSenha] = useState("");
 
   const [tipoCadastro, setTipoCadastro] = useState<TipoCadastro>("PACIENTE");
   const [formData, setFormData] = useState<
@@ -28,12 +29,19 @@ export default function Cadastro() {
   >(initialSimplifiedState);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
+  // --- FIM DA CORREÇÃO ---
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    // O tipo do evento para handleChange deve ser mais genérico para lidar com confirmarSenha
+    // ou use uma função separada
+    if (name === "confirmarSenha") {
+      setConfirmarSenha(value);
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleTipoCadastroChange = (
@@ -61,7 +69,7 @@ export default function Cadastro() {
         throw new Error("A senha é obrigatória.");
       }
       if (formData.senha !== confirmarSenha) {
-        throw new Error("As senhas não coincidem."); // Validação adicionada
+        throw new Error("As senhas não coincidem.");
       }
       if (tipoCadastro === "EDUCADOR_FISICO" && !formData.cref?.trim()) {
         throw new Error("O CREF é obrigatório para Educador Físico.");
@@ -94,6 +102,7 @@ export default function Cadastro() {
           </label>
           <select
             id="tipoCadastro"
+            name="tipoCadastro"
             value={tipoCadastro}
             onChange={handleTipoCadastroChange}
             style={selectStyle}
@@ -247,7 +256,7 @@ export default function Cadastro() {
           placeholder="Confirmar Senha"
           name="confirmarSenha"
           value={confirmarSenha}
-          onChange={handleChange}
+          onChange={handleChange} // Usa a mesma função handleChange
           required
           style={inputStyle}
         />

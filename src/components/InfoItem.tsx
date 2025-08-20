@@ -9,10 +9,6 @@ export default function InfoItem({ label, value }: InfoItemProps) {
     <div style={styles.infoItem}>
       <span style={styles.label}>{label}:</span>
       <span style={styles.value}>{value}</span>
-<<<<<<< HEAD
-    
-=======
->>>>>>> 6350aebb2cb5c7e657aa1885b82450a3dfcf3c6b
     </div>
   );
 }

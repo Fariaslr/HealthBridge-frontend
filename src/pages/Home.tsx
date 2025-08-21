@@ -71,8 +71,6 @@ export default function Home() {
             </Typography>
           ))}
         </Box>
-
-        {/* Conteúdo da aba */}
         <Box>
           {activeTab === "Plano" && <Plano />}
           {activeTab === "Consultas" && <Consultas />}

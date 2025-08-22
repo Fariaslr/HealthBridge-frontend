@@ -1,4 +1,3 @@
-import { CalendarMonth } from "@mui/icons-material";
 import {
   Grid,
   Paper,
@@ -6,7 +5,6 @@ import {
   Button,
   Box,
   LinearProgress,
-  IconButton,
 } from "@mui/material";
 import {
   LineChart,
@@ -58,7 +56,6 @@ export default function Plano() {
         </Paper>
       </Grid>
 
-      {/* Treino de hoje */}
       <Grid size={{ xs: 12, md: 4 }}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="subtitle2" color="text.secondary">

@@ -34,6 +34,7 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
           style={inputStyle}
+          autoComplete="email"
         />
         <input
           type="password"

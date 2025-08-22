@@ -1,9 +1,7 @@
 import { Delete, Edit, Visibility } from "@mui/icons-material";
 import { Button, Card, CardContent, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { useState } from "react";
-import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { use, useState } from "react";
 
-// Definindo o tipo do treino
 type Exercício = {
   nome: string;
   series: number;
@@ -17,40 +15,41 @@ type Treino = {
   exercicios: Exercício[];
   notas?: string;
 };
+const treinosMock: Treino[] = [
+  {
+    data: "7 Maio",
+    hora: "9:00",
+    titulo: "Treino A",
+    tipo: "Força",
+    exercicios: [
+      { nome: "Agachamento", series: 3 },
+      { nome: "Supino reto", series: 3 },
+      { nome: "Remada curvada", series: 3 },
+    ],
+    notas: "Aumentar a carga em 5 kg",
+  },
+  {
+    data: "2 Maio",
+    hora: "10:00",
+    titulo: "Treino B",
+    tipo: "Cardio",
+    exercicios: [],
+    notas: "",
+  },
+  {
+    data: "25 Abril",
+    hora: "08:00",
+    titulo: "Treino C",
+    tipo: "Flexibilidade",
+    exercicios: [],
+    notas: "",
+  },
+];
+
 
 export default function Treinos() {
-  const [treinoSelecionado, setTreinoSelecionado] = useState<Treino | null>(null);
-
-  const treinos: Treino[] = [
-    {
-      data: "7 Maio",
-      hora: "9:00",
-      titulo: "Treino A",
-      tipo: "Força",
-      exercicios: [
-        { nome: "Agachamento", series: 3 },
-        { nome: "Supino reto", series: 3 },
-        { nome: "Remada curvada", series: 3 },
-      ],
-      notas: "Aumentar a carga em 5 kg",
-    },
-    {
-      data: "2 Maio",
-      hora: "10:00",
-      titulo: "Treino B",
-      tipo: "Cardio",
-      exercicios: [],
-      notas: "",
-    },
-    {
-      data: "25 Abril",
-      hora: "08:00",
-      titulo: "Treino C",
-      tipo: "Flexibilidade",
-      exercicios: [],
-      notas: "",
-    },
-  ];
+  const [treinos, setTreinos] = useState<Treino[]>(treinosMock);
+  const [treinoSelecionado, setTreinoSelecionado] = useState<Treino | null>(treinos[0]);
 
   return (
     <Grid container spacing={3}>
@@ -112,10 +111,29 @@ export default function Treinos() {
               </Typography>
               <Typography>
                 {treinoSelecionado.data}, {
-                treinoSelecionado.hora}
+                  treinoSelecionado.hora}
               </Typography>
               <Typography>
-                <strong>Exercícios:</strong> 
+                <strong>Exercícios:</strong>
+              </Typography>
+              <Typography>
+                {treinoSelecionado.exercicios.length > 0 ? (
+                  treinoSelecionado.exercicios.map((exercicio, index) => (
+                    <Card key={index} variant="outlined" sx={{ my: 1, p: 1 }}>
+                      <Typography variant="body2">
+                        <strong>{exercicio.nome}</strong>
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Séries: {exercicio.series}
+                      </Typography>
+                    </Card>
+                  ))
+                ) : (
+                  // Mensagem a ser exibida se não houver exercícios
+                  <Typography variant="body2" color="text.secondary">
+                    Nenhum exercício cadastrado.
+                  </Typography>
+                )}
               </Typography>
               <Typography>
                 <strong>Tipo:</strong> {treinoSelecionado.tipo}

@@ -11,12 +11,13 @@ import Consultas from "./Consulta";
 import Plano from "./Plano";
 import Treinos from "./Treinos";
 import Dietas from "./Dietas";
+import Perfil from "./Perfil";
 
 
 export default function Home() {
-  const tabs = ["Plano", "Consultas", "Treinos", "Dietas"];
+  const tabs = ["Perfil","Plano", "Consultas", "Treinos", "Dietas"];
   const { usuario, setUsuario } = useAuth();
-  const [activeTab, setActiveTab] = useState("Plano");
+  const [activeTab, setActiveTab] = useState("Perfil");
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -70,6 +71,7 @@ export default function Home() {
           ))}
         </Box>
         <Box>
+          {activeTab === "Dashboard" && <Perfil />}
           {activeTab === "Plano" && <Plano />}
           {activeTab === "Consultas" && <Consultas />}
           {activeTab === "Treinos" && <Treinos />}

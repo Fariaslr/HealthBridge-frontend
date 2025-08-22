@@ -15,5 +15,5 @@ export type Pessoa = {
   sexo: Sexo;
   tipoUsuario: "Paciente" | "Nutricionista" | "EducadorFisico";
   endereco: Endereco;
-  plano: Plano;
+  plano: Plano | null;
 };

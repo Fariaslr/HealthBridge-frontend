@@ -24,7 +24,6 @@ export interface Consulta {
     observacoes: string | null; 
     dataCriacao: string;
     dataAtualizacao: string;
-    links?: Array<{ rel: string; href: string }>;
 
     // REMOVER métodos que Jackson expõe como propriedades
     // medidaAntibraço?: string; // REMOVER

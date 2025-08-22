@@ -33,15 +33,13 @@ export default function Home() {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box mb={4}>
         <Typography variant="h5" fontWeight="bold">
-          Olá, {usuario.nome}
+          Olá, {usuario.nome} {usuario.sobrenome}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Meta: Ganhar massa magra
+          Meta: {usuario.plano?.objetivo || "Não definido"}
         </Typography>
       </Box>
-      {/* Header */}
       <Box>
-        {/* Aba de navegação */}
         <Box
           display="flex"
           gap={3}

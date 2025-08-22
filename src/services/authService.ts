@@ -1,6 +1,8 @@
 import axios from "axios";
+
 import type { Pessoa } from "../models/Pessoa"; 
 import type { CadastroInput, EducadorFisicoInput, NutricionistaInput, PacienteInput, TipoCadastro } from "../types/cadastroTypes";
+import { users } from "../mock/mockPessoa";
 
 const API_BASE = "http://localhost:8080";
 
@@ -18,10 +20,17 @@ export async function login(email: string, senha: string): Promise<Pessoa> {
       } else {
         throw new Error(`Erro de autenticação: ${error.response.statusText || "Erro desconhecido"}`);
       }
-    } else {
-      throw new Error("Erro de conexão. Verifique sua rede.");
+    }const user = users.find(
+      (u) => u.email === email && u.senha === senha
+    );
+
+    if (user) {
+      return user;
     }
+
+    throw new Error("Não foi possível conectar ao servidor e o usuário não existe no mock.");
   }
+  
 }
 
 export async function cadastrarPaciente(dados: PacienteInput): Promise<Pessoa> {

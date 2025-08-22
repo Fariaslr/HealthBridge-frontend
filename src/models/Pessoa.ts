@@ -7,6 +7,7 @@ export type Pessoa = {
   cpf: string;
   nome: string;
   sobrenome: string;
+  senha: string;
   telefone: string;
   usuario: string;
   email: string;

@@ -18,7 +18,6 @@ export default function Login() {
       setUsuario(user);
       setErro("");
       navigate("/home");
-      console.log(user.tipoUsuario)
     } catch (err: any) {
       setErro(err.message || "Erro ao fazer login");
     }

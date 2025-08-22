@@ -33,7 +33,7 @@ export default function Home() {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box mb={4}>
         <Typography variant="h5" fontWeight="bold">
-          Olá, João
+          Olá, {usuario.nome}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Meta: Ganhar massa magra

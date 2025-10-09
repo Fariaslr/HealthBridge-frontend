@@ -54,54 +54,7 @@ const profissionalSaudeMock: Pessoa = {
 };
 
 export const consultasMock: Consulta[] = [
-  {
-    id: "consulta1",
-    plano: planoMock,
-    profissionalSaude: profissionalSaudeMock,
-    peso: 75.5,
-    altura: 1.75,
-    numeroRefeicoes: 5,
-    torax: 95.0,
-    abdomen: 80.0,
-    cintura: 78.0,
-    quadril: 100.0,
-    bracoEsquerdo: 35.0,
-    bracoDireito: 35.5,
-    antibracoEsquerdo: 28.0,
-    antibracoDireito: 28.5,
-    coxaEsquerda: 55.0,
-    coxaDireita: 55.5,
-    panturrilhaEsquerda: 38.0,
-    panturrilhaDireita: 38.5,
-    pescoco: 36.0,
-    observacoes: "Paciente demonstrou bom progresso na última consulta. Manter o foco na dieta e no treino.",
-    dataCriacao: "2025-08-15T09:30:00Z",
-    dataAtualizacao: "2025-08-15T10:00:00Z",
-  },
-  {
-    id: "consulta2",
-    plano: planoMock,
-    profissionalSaude: profissionalSaudeMock,
-    peso: 77.0,
-    altura: 1.75,
-    numeroRefeicoes: 5,
-    torax: 96.0,
-    abdomen: 81.0,
-    cintura: 79.0,
-    quadril: 101.0,
-    bracoEsquerdo: 35.5,
-    bracoDireito: 36.0,
-    antibracoEsquerdo: 28.5,
-    antibracoDireito: 29.0,
-    coxaEsquerda: 55.5,
-    coxaDireita: 56.0,
-    panturrilhaEsquerda: 38.5,
-    panturrilhaDireita: 39.0,
-    pescoco: 36.5,
-    observacoes: "Segunda consulta de acompanhamento. Focar na ingestão de proteínas e no descanso.",
-    dataCriacao: "2025-07-20T09:00:00Z",
-    dataAtualizacao: "2025-07-20T09:45:00Z",
-  },
+  
 ];
 
 export default function Consultas() {
@@ -174,7 +127,6 @@ export default function Consultas() {
         </TableContainer>
       </Grid>
 
-      {/* Coluna de Detalhes */}
       <Grid size={{ xs: 12, md: 4 }}>
         {consultaSelecionada && (
           <Card>

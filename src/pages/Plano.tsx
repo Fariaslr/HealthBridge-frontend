@@ -1,23 +1,54 @@
-import { users } from "../mock/mockPessoa";
+import { Button, CircularProgress } from "@mui/material";
 import type { Plano } from "../models/Plano";
-import type { ProfissionalSaude } from "../models/ProfissionalSaude";
+import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { PlanoModalForm } from "../components/ModalPlano";
 
 export default function Plano() {
-  const planoMock: Plano = {
-    id: "plano1",
-    paciente: users[0], // Usando o primeiro usuário do seu mockPessoa.
-    objetivo: "HIPERTROFIA",
-    nivelAtividadeFisica: "EXTREMAMENTE_ATIVO",
-    profissionalSaude: {} as ProfissionalSaude, // Mock vazio para evitar recursão infinita
-    dataCriacao: "2025-01-01T10:00:00Z",
-    dataAtualizacao: "2025-01-10T11:00:00Z",
-  };
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const { planoUsuario, isPlanoLoading } = useAuth();
+  const planoExiste = !!planoUsuario;
+
+  if (isPlanoLoading) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <CircularProgress />
+        <p>Carregando plano...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <p><b>Objetivo:</b> {planoMock.objetivo}</p>
-      <p><b>Nível de Atividade física:</b> {planoMock.nivelAtividadeFisica}</p>
-      <p><b>Profissional Responsável</b> {planoMock.profissionalSaude.nome + " "+ planoMock.profissionalSaude.sobrenome}</p>
-      <p><b>Última alteração:</b> {planoMock.dataAtualizacao}</p>
+      {planoExiste ? (
+        <>
+          <p><b>Objetivo:</b> {planoUsuario.objetivo || 'Não definido'}</p>
+          <p><b>Nível de Atividade física:</b> {planoUsuario.nivelAtividadeFisica || 'Não definido'} </p>
+          <p><b>Profissional Responsável:</b> {planoUsuario.profissionalSaude.nome || 'Não atribuído'} </p>
+          <p><b>Última alteração:</b> {new Date(planoUsuario.dataAtualizacao).toLocaleDateString()} </p>
+
+          <div style={{ marginTop: '20px' }}>
+            <Button variant="contained" color="primary">Editar Plano</Button>
+          </div>
+        </>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '30px' }}>
+          <p>Parece que você ainda não possui um plano cadastrado.</p>
+
+          {/* 4. O Botão Cadastrar só aparece se o plano NÃO existir */}
+          <Button variant="contained" color="secondary" onClick={handleOpen}>Cadastrar Plano</Button>
+        </div>
+      )}
+
+      <PlanoModalForm
+        open={open}
+        onClose={handleClose}
+        plano={planoExiste ? planoUsuario : null} // Passa o plano (ou null se for cadastro)
+      />
     </div>
+
   );
 }

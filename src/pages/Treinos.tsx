@@ -16,36 +16,8 @@ type Treino = {
   notas?: string;
 };
 const treinosMock: Treino[] = [
-  {
-    data: "7 Maio",
-    hora: "9:00",
-    titulo: "Treino A",
-    tipo: "Força",
-    exercicios: [
-      { nome: "Agachamento", series: 3 },
-      { nome: "Supino reto", series: 3 },
-      { nome: "Remada curvada", series: 3 },
-    ],
-    notas: "Aumentar a carga em 5 kg",
-  },
-  {
-    data: "2 Maio",
-    hora: "10:00",
-    titulo: "Treino B",
-    tipo: "Cardio",
-    exercicios: [],
-    notas: "",
-  },
-  {
-    data: "25 Abril",
-    hora: "08:00",
-    titulo: "Treino C",
-    tipo: "Flexibilidade",
-    exercicios: [],
-    notas: "",
-  },
-];
 
+];
 
 export default function Treinos() {
   const [treinos, setTreinos] = useState<Treino[]>(treinosMock);

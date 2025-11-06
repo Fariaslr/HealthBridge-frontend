@@ -12,7 +12,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
   IconButton,
 } from "@mui/material";
 import { Visibility, Edit, Delete } from "@mui/icons-material";
@@ -21,37 +20,6 @@ import type { ProfissionalSaude } from "../models/ProfissionalSaude";
 import type { Plano } from "../models/Plano";
 import { users } from "../mock/mockPessoa";
 import type { Pessoa } from "../models/Pessoa";
-
-
-const planoMock: Plano = {
-  id: "plano1",
-  paciente: users[0], // Usando o primeiro usuário do seu mockPessoa.
-  objetivo: "HIPERTROFIA",
-  nivelAtividadeFisica: "EXTREMAMENTE_ATIVO",
-  profissionalSaude: {} as ProfissionalSaude, // Mock vazio para evitar recursão infinita
-  dataCriacao: "2025-01-01T10:00:00Z",
-  dataAtualizacao: "2025-01-10T11:00:00Z",
-};
-
-const profissionalSaudeMock: Pessoa = {
-  id: "prof1",
-  nome: "Dra. Ana Silva",
-  email: "ana.silva@exemplo.com",
-  cpf: "99988877766", // Add this property
-  sobrenome: "Silva", // Add this property
-  telefone: "11987654321", // Add this property
-  usuario: "anas", // Add this property
-  senha: "hashed_password_or_mock", // Add this property
-  dataNascimento: "1985-05-15", // Add this property
-  sexo: "FEMININO", // Add this property
-  tipoUsuario: "Nutricionista", // Add this property
-  endereco: {
-    cep: "54321-987",
-    complemento: "Sala 5",
-    numero: 200,
-  },
-  plano: null 
-};
 
 export const consultasMock: Consulta[] = [
   

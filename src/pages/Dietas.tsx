@@ -23,40 +23,7 @@ type Dieta = {
 };
 
 const dietasMock: Dieta[] = [
-  {
-    id: "d1",
-    data: "10 de Agosto",
-    nutricionista: "Dra. Sandra",
-    status: "Ativa",
-    caloriasTotais: 2200,
-    refeicoes: [
-      {
-        nome: "Café da Manhã",
-        calorias: 500,
-        macros: { proteina: 30, carboidratos: 50, gorduras: 20 },
-      },
-      {
-        nome: "Almoço",
-        calorias: 800,
-        macros: { proteina: 40, carboidratos: 60, gorduras: 25 },
-      },
-      {
-        nome: "Jantar",
-        calorias: 600,
-        macros: { proteina: 35, carboidratos: 45, gorduras: 15 },
-      },
-    ],
-    notas: "Beber pelo menos 2L de água por dia.",
-  },
-  {
-    id: "d2",
-    data: "1 de Agosto",
-    nutricionista: "Dra. Laura",
-    status: "Concluída",
-    caloriasTotais: 2000,
-    refeicoes: [],
-    notas: "Manter a hidratação.",
-  },
+  
 ];
 
 export default function Dietas() {

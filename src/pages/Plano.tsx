@@ -38,15 +38,14 @@ export default function Plano() {
         <div style={{ textAlign: 'center', padding: '30px' }}>
           <p>Parece que você ainda não possui um plano cadastrado.</p>
 
-          {/* 4. O Botão Cadastrar só aparece se o plano NÃO existir */}
-          <Button variant="contained" color="secondary" onClick={handleOpen}>Cadastrar Plano</Button>
+          <Button variant="contained" color="primary" onClick={handleOpen}>Cadastrar Plano</Button>
         </div>
       )}
 
       <PlanoModalForm
         open={open}
         onClose={handleClose}
-        plano={planoExiste ? planoUsuario : null} // Passa o plano (ou null se for cadastro)
+        plano={planoExiste ? planoUsuario : null} 
       />
     </div>
 

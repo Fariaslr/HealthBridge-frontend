@@ -30,7 +30,6 @@ type AuthContextType = {
   usuario: AuthUser | null;
   setUsuario: (user: AuthUser | null) => void;
   planoUsuario: Plano | null;
-  carregarPlanoUsuario: () => Promise<void>;
   setPlanoUsuario: Dispatch<SetStateAction<Plano | null>>;
   isAuthenticated: boolean;
   isAuthReady: boolean;
@@ -148,7 +147,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     planoUsuario,
     isPlanoLoading,
     planoInexistente,
-    carregarPlanoUsuario,
   ]);
 
   return (
@@ -157,7 +155,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         usuario,
         setUsuario,
         planoUsuario,
-        carregarPlanoUsuario,
         setPlanoUsuario,
         isAuthenticated,
         isAuthReady,

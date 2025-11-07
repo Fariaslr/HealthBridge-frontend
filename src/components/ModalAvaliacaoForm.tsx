@@ -1,0 +1,35 @@
+import { Modal, Box, Typography, Button } from '@mui/material';
+import type { FC } from 'react';
+import type { Consulta } from '../models/Consulta';
+
+interface AvaliacaoModalFormProps {
+    open: boolean;
+    onClose: () => void;
+    avaliacao: any | Consulta; 
+}
+
+const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+};
+
+export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose, avaliacao }) => {
+    const isEditing = !!avaliacao;
+    const title = isEditing ? 'Editar Avaliação' : 'Nova Avaliação';
+
+    return (
+        <Modal open={open} onClose={onClose}>
+            <Box sx={style}>
+                <Typography variant="h6" component="h2">{title}</Typography>
+                <p> [FORMULÁRIO DE AVALIAÇÃO AQUI] </p>
+                <Button onClick={onClose} variant="contained">Salvar e Fechar</Button>
+            </Box>
+        </Modal>
+    );
+};

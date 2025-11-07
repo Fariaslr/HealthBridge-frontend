@@ -65,13 +65,14 @@ const containerStyle: React.CSSProperties = {
   alignItems: "center",
   height: "100vh",
   width: "100vw",
+  backgroundColor: "#0a0c87f0"
 };
 
 const formStyle: React.CSSProperties = {
   backgroundColor: "#fff",
   padding: "2rem",
   borderRadius: "8px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  boxShadow: "0 4px 12px rgba(65, 2, 2, 0.1)",
   minWidth: "320px",
   maxWidth: "400px",
   width: "100%",

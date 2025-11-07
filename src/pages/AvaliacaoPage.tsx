@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { Visibility, Edit, Delete } from "@mui/icons-material";
 import type { Consulta } from "../models/Consulta";
+import { AvaliacaoModalForm } from "../components/ModalAvaliacaoForm";
 export const consultasMock: Consulta[] = [
   
 ];
@@ -25,6 +26,19 @@ export default function AvaliacaoPage() {
   const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(
     consultas[0]
   );
+
+    const [openAvaliacaoModal, setOpenAvaliacaoModal] = useState(false);
+    const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState(null); 
+
+    const handleOpen = () => {
+        setAvaliacaoParaEditar(null); 
+        setOpenAvaliacaoModal(true);
+    };
+    
+    const handleClose = () => {
+        setOpenAvaliacaoModal(false);
+        setAvaliacaoParaEditar(null);
+    };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -41,9 +55,8 @@ export default function AvaliacaoPage() {
 
   return (
     <Grid container spacing={3}>
-      {/* Coluna da Tabela */}
       <Grid size={{ xs: 12, md: 8 }}>
-        <Button variant="contained" sx={{ mb: 2 }}>
+        <Button variant="contained" sx={{ mb: 2 }} onClick={handleOpen}>
           Nova Avaliação
         </Button>
         <TableContainer component={Paper}>
@@ -110,6 +123,11 @@ export default function AvaliacaoPage() {
           </Card>
         )}
       </Grid>
+      <AvaliacaoModalForm
+                open={openAvaliacaoModal}
+                onClose={handleClose}
+                avaliacao={avaliacaoParaEditar} // Passamos null para criação
+            />
     </Grid>
   );
 }

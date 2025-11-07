@@ -14,7 +14,7 @@ export default function PlanoPage() {
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
-  const { planoUsuario, isPlanoLoading, carregarPlanoUsuario, setPlanoUsuario } = useAuth();
+  const { planoUsuario, isPlanoLoading, setPlanoUsuario } = useAuth();
   const profissional = planoUsuario?.profissionalSaude;
   const planoExiste = !!planoUsuario;
 
@@ -39,7 +39,7 @@ export default function PlanoPage() {
       setPlanoUsuario(null);
       handleCloseConfirm();
       console.log(`Plano ID ${planoUsuario.id} excluído com sucesso!`);
-      
+
     } catch (error) {
       console.error("Erro ao deletar plano:", error);
       handleCloseConfirm();
@@ -71,9 +71,24 @@ export default function PlanoPage() {
             )}
           </p>
 
+          <p>
+            <b>Criação:</b>{" "}
+            {new Date(planoUsuario.dataCriacao).toLocaleString(
+              'pt-BR',
+              {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              }
+            )}
+          </p>
+
           <div style={{ marginTop: '20px' }}>
             <Button variant="contained" color="primary" onClick={handleOpenForm}>Editar Plano</Button>
-            <Button variant="contained" color="secondary" onClick={handleOpenConfirm}>Excluir</Button>
+            <Button variant="contained" color="secondary" style={{ marginLeft: "5px" }} onClick={handleOpenConfirm}>Excluir</Button>
           </div>
         </>
       ) : (
@@ -105,10 +120,10 @@ export default function PlanoPage() {
           <Button onClick={handleCloseConfirm} color="primary">
             Cancelar
           </Button>
-          <Button 
-            onClick={handleDelete} 
-            color="error" 
-            variant="contained" 
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
             autoFocus
           >
             Excluir Plano

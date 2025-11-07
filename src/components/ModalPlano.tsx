@@ -1,22 +1,12 @@
 import {
-    Modal,
-    Box,
-    Typography,
-    Button,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
-    Grid,
-    type SelectChangeEvent,
+    Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, RadioGroup, FormControlLabel, Radio, Grid, type SelectChangeEvent,
 } from "@mui/material";
 import React, { useState, useEffect, type FC } from "react";
 import type { Objetivo } from "../models/Objetivo";
 import type { NivelAtividadeFisica } from "../models/NivelAtividadeFisica";
 import type { Plano } from "../models/Plano";
+import { useAuth } from "../context/AuthContext";
+import { atualizarPlano, criarPlano, type PlanoRecordDto } from "../services/planoService";
 
 
 const OBJETIVOS_DISPLAY: Record<Objetivo, string> = {
@@ -36,11 +26,10 @@ const NIVEIS_ATIVIDADE_DISPLAY: Record<NivelAtividadeFisica, string> = {
 interface PlanoModalFormProps {
     open: boolean;
     onClose: () => void;
-    plano: Plano | null; // Plano existente para edição
+    plano: Plano | null;
 }
 
 const style = {
-    // ... (Estilos, mantidos para concisão) ...
     position: 'absolute' as 'absolute',
     top: '50%',
     left: '50%',
@@ -56,14 +45,9 @@ const style = {
 
 export const PlanoModalForm: FC<PlanoModalFormProps> = ({ open, onClose, plano }) => {
     const isEditing = !!plano;
+    const { usuario, carregarPlanoUsuario, setPlanoUsuario } = useAuth();
+    const [formData, setFormData] = useState({ objetivo: "" as Objetivo | "", nivelAtividade: "" as NivelAtividadeFisica | "" });
 
-    // 1. ESTADO LOCAL DO FORMULÁRIO (usando os tipos importados)
-    const [formData, setFormData] = useState({
-        objetivo: "" as Objetivo | "", // Inicializado como vazio ou tipo Objetivo
-        nivelAtividade: "" as NivelAtividadeFisica | ""
-    });
-
-    // Preencher o formulário se for EDIÇÃO
     useEffect(() => {
         if (plano) {
             setFormData({
@@ -87,24 +71,56 @@ export const PlanoModalForm: FC<PlanoModalFormProps> = ({ open, onClose, plano }
     };
 
     const handleNivelChange = (event: SelectChangeEvent<NivelAtividadeFisica>) => {
-        // O valor aqui já é garantido pelo TypeScript como sendo um dos seus tipos!
         setFormData((prev) => ({
             ...prev,
             nivelAtividade: event.target.value,
         }));
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         console.log("Dados do Plano a serem salvos (payload):", formData);
 
-        // EX: Chamada à API
-        // if (isEditing) {
-        //    api.updatePlano(plano.id, formData);
-        // } else {
-        //    api.createPlano(formData);
-        // }
+        if (!formData.objetivo || !formData.nivelAtividade) {
+            return;
+        }
 
-        onClose();
+        if (!usuario || !usuario.id) {
+            console.error("Usuário não logado ou sem ID.");
+            return;
+        }
+
+        try {
+            if (isEditing) {
+                if (!plano || !plano.id) {
+                    throw new Error("ID do plano não encontrado para edição.");
+                }
+                const updateDto: Partial<PlanoRecordDto> = {
+                    objetivo: formData.objetivo,
+                    nivelAtividadeFisica: formData.nivelAtividade,
+                };
+
+                const planoAtualizado = await atualizarPlano(plano.id, updateDto);
+                setPlanoUsuario(planoAtualizado);
+                console.log("Plano Atualizado com sucesso!");
+
+            } else {
+                const pacienteId = usuario.tipoUsuario === "Paciente" ? usuario.id : "id-paciente-fixo"; 
+                const createDto: PlanoRecordDto = {
+                    pacienteId: pacienteId,
+                    objetivo: formData.objetivo,
+                    nivelAtividadeFisica: formData.nivelAtividade,
+                    profissionalSaudeId: "00867429-1ecb-43c1-ae9b-e71083324498",
+                };
+
+                const planoCriado = await criarPlano(createDto);
+                setPlanoUsuario(planoCriado);
+                console.log("Plano Criado com sucesso!");
+            }
+            onClose();
+
+        } catch (error) {
+            console.error("Falha ao salvar o plano:", error);
+        }
     };
 
     const isSaveDisabled = !formData.objetivo || !formData.nivelAtividade;
@@ -121,19 +137,17 @@ export const PlanoModalForm: FC<PlanoModalFormProps> = ({ open, onClose, plano }
                     {isEditing ? "Editar Plano Existente" : "Cadastrar Novo Plano"}
                 </Typography>
 
-                <Grid container spacing={3}> {/* spacing={X} no container */}
+                <Grid container spacing={3}>
 
-                    {/* 1. SELEÇÃO DE OBJETIVO */}
-                    <Grid size={{ xs: 12, md: 8 }}> {/* Cada filho deve ter a prop 'item' */}
+                    <Grid size={{ xs: 12, md: 8 }}>
                         <Typography variant="subtitle1" gutterBottom>
-                            Objetivo Principal:
+                            <b>Objetivo Principal:</b>
                         </Typography>
                         <FormControl component="fieldset" fullWidth>
                             <RadioGroup
                                 name="objetivo"
                                 value={formData.objetivo}
                                 onChange={handleChange}
-                            // row // Removi 'row' para empilhar verticalmente e melhorar a leitura no modal
                             >
                                 {(Object.keys(OBJETIVOS_DISPLAY) as Objetivo[]).map((key) => (
                                     <FormControlLabel
@@ -147,8 +161,7 @@ export const PlanoModalForm: FC<PlanoModalFormProps> = ({ open, onClose, plano }
                         </FormControl>
                     </Grid>
 
-                    {/* 2. NÍVEL DE ATIVIDADE FÍSICA */}
-                    <Grid size={{ xs: 12, md: 8 }}> {/* Cada filho deve ter a prop 'item' */}
+                    <Grid size={{ xs: 12, md: 8 }}>
                         <FormControl fullWidth>
                             <InputLabel id="nivel-atividade-label">Nível de Atividade Física</InputLabel>
                             <Select
@@ -166,7 +179,6 @@ export const PlanoModalForm: FC<PlanoModalFormProps> = ({ open, onClose, plano }
                             </Select>
                         </FormControl>
                     </Grid>
-                    {/* Fim do Grid. Agora só temos os 2 campos obrigatórios. */}
                 </Grid>
 
                 <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end' }}>

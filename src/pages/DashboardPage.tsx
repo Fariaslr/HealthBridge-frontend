@@ -37,7 +37,7 @@ const macrosData = [
 
 const COLORS = ["#3b82f6", "#10b981", "#f97316"];
 
-export default function Dashboard() {
+export default function DashboardPage() {
   return (
     <Grid container spacing={3}>
       <Grid size={{ xs: 6, md: 8 }}>

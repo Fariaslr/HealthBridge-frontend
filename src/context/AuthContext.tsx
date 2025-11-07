@@ -6,6 +6,8 @@ import {
   useRef,
   useCallback,
   type ReactNode,
+  type SetStateAction,
+  type Dispatch,
 } from "react";
 
 import type { Pessoa } from "../models/Pessoa";
@@ -29,6 +31,7 @@ type AuthContextType = {
   setUsuario: (user: AuthUser | null) => void;
   planoUsuario: Plano | null;
   carregarPlanoUsuario: () => Promise<void>;
+  setPlanoUsuario: Dispatch<SetStateAction<Plano | null>>;
   isAuthenticated: boolean;
   isAuthReady: boolean;
   isPlanoLoading: boolean;
@@ -155,10 +158,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUsuario,
         planoUsuario,
         carregarPlanoUsuario,
+        setPlanoUsuario,
         isAuthenticated,
         isAuthReady,
         isPlanoLoading,
-        planoInexistente,
+        planoInexistente
       }}
     >
       {children}

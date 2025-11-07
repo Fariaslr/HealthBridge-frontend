@@ -16,16 +16,11 @@ import {
 } from "@mui/material";
 import { Visibility, Edit, Delete } from "@mui/icons-material";
 import type { Consulta } from "../models/Consulta";
-import type { ProfissionalSaude } from "../models/ProfissionalSaude";
-import type { Plano } from "../models/Plano";
-import { users } from "../mock/mockPessoa";
-import type { Pessoa } from "../models/Pessoa";
-
 export const consultasMock: Consulta[] = [
   
 ];
 
-export default function Consultas() {
+export default function AvaliacaoPage() {
   const [consultas] = useState<Consulta[]>(consultasMock);
   const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(
     consultas[0]
@@ -48,11 +43,8 @@ export default function Consultas() {
     <Grid container spacing={3}>
       {/* Coluna da Tabela */}
       <Grid size={{ xs: 12, md: 8 }}>
-        <Typography variant="h5" mb={2}>
-          Consultas
-        </Typography>
         <Button variant="contained" sx={{ mb: 2 }}>
-          Nova Consulta
+          Nova Avaliação
         </Button>
         <TableContainer component={Paper}>
           <Table>

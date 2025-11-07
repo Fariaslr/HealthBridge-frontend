@@ -19,7 +19,7 @@ const treinosMock: Treino[] = [
 
 ];
 
-export default function Treinos() {
+export default function TreinosPage() {
   const [treinos, setTreinos] = useState<Treino[]>(treinosMock);
   const [treinoSelecionado, setTreinoSelecionado] = useState<Treino | null>(treinos[0]);
 
@@ -27,9 +27,6 @@ export default function Treinos() {
     <Grid container spacing={3}>
       {/* Coluna da Tabela */}
       <Grid size={{ xs: 12, md: 8 }}>
-        <Typography variant="h5" mb={2}>
-          Treinos
-        </Typography>
         <Button variant="contained" sx={{ mb: 2 }}>
           Novo Treino
         </Button>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import ModalEdicao from "../components/ModalPerfil";
 import InfoItem from "../components/InfoItem";
 
-export default function Perfil() {
+export default function PerfilPage() {
   const { usuario, setUsuario } = useAuth();
   const [campoSelecionado, setCampoSelecionado] = useState<string | null>(null);
 

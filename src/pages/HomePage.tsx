@@ -1,5 +1,4 @@
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -7,24 +6,18 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-import Consultas from "./Consulta";
-import Plano from "./Plano";
-import Treinos from "./Treinos";
-import Dietas from "./Dietas";
-import Dashboard from "./Dashboard";
+import Plano from "./PlanoPage";
+import Treinos from "./TreinosPage";
+import Dietas from "./DietaPage";
+import Dashboard from "./DashboardPage";
+import AvaliacaoPage from "./AvaliacaoPage";
+import PerfilPage from "./PerfilPage";
 
 
-export default function Home() {
-  const tabs = ["Dashboard","Plano", "Consultas", "Treinos", "Dietas","Perfil"];
-  const { usuario, setUsuario } = useAuth();
+export default function HomePage() {
+  const tabs = ["Dashboard","Plano", "Avaliações", "Treinos", "Dietas","Perfil"];
+  const { usuario } = useAuth();
   const [activeTab, setActiveTab] = useState("Plano");
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    setUsuario(null);
-    localStorage.clear();
-    navigate("/login");
-  };
 
   if (!usuario) {
     return <p>Carregando ou usuário não logado...</p>;
@@ -35,9 +28,6 @@ export default function Home() {
       <Box mb={4}>
         <Typography variant="h5" fontWeight="bold">
           Olá, {usuario.nome} {usuario.sobrenome}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Meta: {usuario.plano?.objetivo || "Não definido"}
         </Typography>
       </Box>
       <Box>
@@ -73,9 +63,10 @@ export default function Home() {
         <Box>
           {activeTab === "Dashboard" && <Dashboard />}
           {activeTab === "Plano" && <Plano />}
-          {activeTab === "Consultas" && <Consultas />}
+          {activeTab === "Avaliações" && <AvaliacaoPage />}
           {activeTab === "Treinos" && <Treinos />}
           {activeTab === "Dietas" && <Dietas />}
+          {activeTab === "Perfil" && <PerfilPage />}
         </Box>
       </Box>
     </Container>

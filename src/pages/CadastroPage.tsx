@@ -17,7 +17,7 @@ const initialSimplifiedState: PessoaBaseInput = {
   complemento: "",
 };
 
-export default function Cadastro() {
+export default function CadastroPage() {
   const navigate = useNavigate();
 
   // --- CORREÇÃO: Mova a declaração do useState para AQUI ---

@@ -29,7 +29,6 @@ export async function atualizarPlano(id: string, dto: Partial<PlanoRecordDto>): 
   const response = await axios.put<Plano>(`${API_BASE}/planos/${id}`, dto); 
   return response.data;
 }
-// --- FIM DA CORREÇÃO ---
 
 export async function deletarPlano(id: string): Promise<void> {
   await axios.delete(`${API_BASE}/planos/${id}`);

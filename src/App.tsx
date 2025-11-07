@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home";
-import Cadastro from "./pages/Cadastro.tsx";
-import Login from "./pages/Login";
-import Perfil from "./pages/Perfil";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import type { JSX } from "react";
-import Plano from "./pages/Plano.tsx";
-import Consulta from "./pages/Consulta.tsx";
+import HomePage from "./pages/HomePage.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
+import CadastroPage from "./pages/CadastroPage.tsx";
+import AvaliacaoPage from "./pages/AvaliacaoPage.tsx";
+import PlanoPage from "./pages/PlanoPage.tsx";
+import PerfilPage from "./pages/PerfilPage.tsx";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { usuario, isAuthReady } = useAuth(); 
@@ -23,8 +23,8 @@ function App() {
   return (
     <BrowserRouter basename="/">
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/cadastro" element={<CadastroPage />} />
 
         <Route
           element={
@@ -33,10 +33,10 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route path="/home" element={<Home />} />
-          <Route path="/consultas" element={<Consulta />} />
-          <Route path="/planoPage" element={<Plano />} />
-          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/avaliacao" element={<AvaliacaoPage />} />
+          <Route path="/plano" element={<PlanoPage />} />
+          <Route path="/perfil" element={<PerfilPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />

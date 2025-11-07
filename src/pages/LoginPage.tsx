@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import type { Pessoa } from "../models/Pessoa";
 import { login } from "../services/authService";
 
-export default function Login() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");

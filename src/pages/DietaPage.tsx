@@ -26,7 +26,7 @@ const dietasMock: Dieta[] = [
   
 ];
 
-export default function Dietas() {
+export default function DietaPage() {
   const [dietas, setDietas] = useState<Dieta[]>(dietasMock);
   const [dietaSelecionada, setDietaSelecionada] = useState<Dieta | null>(dietasMock[0]);
 
@@ -35,9 +35,6 @@ export default function Dietas() {
       <Grid container spacing={3}>
         {/* Coluna da Tabela */}
         <Grid size={{ xs: 12, md: 8 }}> {/* <--- Corrected syntax */}
-          <Typography variant="h5" mb={2}>
-            Dietas
-          </Typography>
           <Button variant="contained" sx={{ mb: 2 }}>
             Nova Dieta
           </Button>

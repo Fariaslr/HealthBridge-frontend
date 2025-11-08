@@ -10,10 +10,10 @@ import PlanoPage from "./pages/PlanoPage.tsx";
 import PerfilPage from "./pages/PerfilPage.tsx";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
-  const { usuario, isAuthReady } = useAuth(); 
+  const { usuario, isAuthReady } = useAuth();
 
   if (!isAuthReady) {
-   
+
     return <p>Carregando autenticação...</p>;
   }
   return usuario ? children : <Navigate to="/login" />;
@@ -34,7 +34,12 @@ function App() {
           }
         >
           <Route path="/home" element={<HomePage />} />
-          <Route path="/avaliacao" element={<AvaliacaoPage />} />
+          <Route
+            path="/avaliacao"
+            element={
+                <AvaliacaoPage />
+            }
+          />
           <Route path="/plano" element={<PlanoPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
         </Route>

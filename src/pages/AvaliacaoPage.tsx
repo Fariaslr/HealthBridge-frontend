@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -17,40 +17,45 @@ import {
 import { Visibility, Edit, Delete } from "@mui/icons-material";
 import type { Consulta } from "../models/Consulta";
 import { AvaliacaoModalForm } from "../components/ModalAvaliacaoForm";
-export const consultasMock: Consulta[] = [
-  
-];
+import { useAuth } from "../context/AuthContext";
 
 export default function AvaliacaoPage() {
-  const [consultas] = useState<Consulta[]>(consultasMock);
-  const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(
-    consultas[0]
-  );
+  const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(null);
+  const { carregarConsultas, consultasUsuario, isConsultasLoading } = useAuth();
 
-    const [openAvaliacaoModal, setOpenAvaliacaoModal] = useState(false);
-    const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState(null); 
+  const [openAvaliacaoModal, setOpenAvaliacaoModal] = useState(false);
+  const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState(null);
 
-    const handleOpen = () => {
-        setAvaliacaoParaEditar(null); 
-        setOpenAvaliacaoModal(true);
-    };
-    
-    const handleClose = () => {
-        setOpenAvaliacaoModal(false);
-        setAvaliacaoParaEditar(null);
-    };
+  const handleOpen = () => {
+    setAvaliacaoParaEditar(null);
+    setOpenAvaliacaoModal(true);
+  };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Agendada":
-        return "info";
-      case "Concluída":
-        return "success";
-      case "Cancelada":
-        return "error";
-      default:
-        return "default";
+  useEffect(() => {
+    if (consultasUsuario === null) {
+      carregarConsultas();
     }
+  }, [consultasUsuario, carregarConsultas]);
+
+  useEffect(() => {
+    if (consultasUsuario && consultasUsuario.length > 0 && consultaSelecionada === null) {
+      setConsultaSelecionada(consultasUsuario[0]);
+    }
+  }, [consultasUsuario, consultaSelecionada]);
+
+  useEffect(() => {
+    if (consultasUsuario === null) {
+      carregarConsultas();
+    }
+  }, [consultasUsuario, carregarConsultas]);
+
+  if (isConsultasLoading) {
+    return <p>Carregando avaliações...</p>;
+  }
+
+  const handleClose = () => {
+    setOpenAvaliacaoModal(false);
+    setAvaliacaoParaEditar(null);
   };
 
   return (
@@ -70,7 +75,7 @@ export default function AvaliacaoPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {consultas.map((c) => (
+              {consultasUsuario?.map((c) => (
                 <TableRow
                   key={c.id}
                   hover
@@ -80,7 +85,7 @@ export default function AvaliacaoPage() {
                   <TableCell>{c.dataCriacao}</TableCell>
                   <TableCell>{c.profissionalSaude.nome || "Não identificado"}</TableCell>
                   <TableCell>
-                    
+
                   </TableCell>
                   <TableCell align="right">
                     <IconButton color="primary">
@@ -111,7 +116,7 @@ export default function AvaliacaoPage() {
                 <strong>Data e horário:</strong> {consultaSelecionada.dataAtualizacao}
               </Typography>
               <Typography>
-                <strong>Profissional:</strong> {consultaSelecionada.profissionalSaude.nome.concat(consultaSelecionada.profissionalSaude.sobrenome)}
+                <strong>Profissional:</strong> {consultaSelecionada.profissionalSaude.nome}
               </Typography>
               <Typography>
                 <strong>Objetivo:</strong> {consultaSelecionada.plano.objetivo}
@@ -124,10 +129,10 @@ export default function AvaliacaoPage() {
         )}
       </Grid>
       <AvaliacaoModalForm
-                open={openAvaliacaoModal}
-                onClose={handleClose}
-                avaliacao={avaliacaoParaEditar} // Passamos null para criação
-            />
+        open={openAvaliacaoModal}
+        onClose={handleClose}
+        avaliacao={avaliacaoParaEditar}
+      />
     </Grid>
   );
 }

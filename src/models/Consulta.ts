@@ -24,10 +24,8 @@ export interface Consulta {
     observacoes: string | null; 
     dataCriacao: string;
     dataAtualizacao: string;
-
-    // REMOVER métodos que Jackson expõe como propriedades
-    // medidaAntibraço?: string; // REMOVER
-    // medidaPanturrilha?: string; // REMOVER
-    // medidaBraço?: string; // REMOVER
-    // medidaCoxa?: string; // REMOVER
+    medidaAntibraço?: string;
+    medidaPanturrilha?: string; 
+    medidaBraço?: string;
+    medidaCoxa?: string;
 }

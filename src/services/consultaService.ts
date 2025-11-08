@@ -5,10 +5,27 @@ import type { Consulta } from "../models/Consulta";
 const API_BASE = "http://localhost:8080"; 
 
 export type ConsultaRecordDto = {
-  planoId: string,                     
-  peso: number;
-  altura: number;       
-  profissionalSaudeId: string;
+    planoId: string;
+    profissionalSaudeId: string;
+    peso: number;
+    dataCriacao: string;
+    dataAtualizacao: string;
+    altura: number;
+    numeroRefeicoes: number; 
+    torax: number | null;
+    abdomen: number | null;
+    cintura: number | null;
+    quadril: number | null;
+    bracoEsquerdo: number | null;
+    bracoDireito: number | null;
+    antibracoEsquerdo: number | null;
+    antibracoDireito: number | null;
+    coxaEsquerda: number | null;
+    coxaDireita: number | null;
+    panturrilhaEsquerda: number | null;
+    panturrilhaDireita: number | null;
+    pescoco: number | null;
+    observacoes: string | null; 
 };
 
 export async function listarConsultas(): Promise<Consulta[]> {

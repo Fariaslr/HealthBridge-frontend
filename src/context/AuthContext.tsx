@@ -18,6 +18,8 @@ import type { EducadorFisico } from "../models/EducadorFisico";
 
 import type { Plano } from "../models/Plano";
 import { buscarPlanoPorPacienteId } from "../services/planoService";
+import type { Consulta } from "../models/Consulta";
+import { buscarConsultasPorPacienteId } from "../services/consultaService";
 
 type AuthUser =
   | Paciente
@@ -31,6 +33,13 @@ type AuthContextType = {
   setUsuario: (user: AuthUser | null) => void;
   planoUsuario: Plano | null;
   setPlanoUsuario: Dispatch<SetStateAction<Plano | null>>;
+  carregarPlanoUsuario: () => Promise<void>;
+
+  consultasUsuario: Consulta[] | null;
+  setConsultasUsuario: Dispatch<SetStateAction<Consulta[] | null>>;
+  carregarConsultas: () => Promise<void>;
+  isConsultasLoading: boolean;
+  
   isAuthenticated: boolean;
   isAuthReady: boolean;
   isPlanoLoading: boolean;
@@ -45,6 +54,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [isPlanoLoading, setIsPlanoLoading] = useState(false);
   const [planoInexistente, setPlanoInexistente] = useState(false);
+
+  const [consultasUsuario, setConsultasUsuario] = useState<Consulta[] | null>(null);
+  const [isConsultasLoading, setIsConsultasLoading] = useState(false);
 
   const isAuthenticated = !!usuario;
   const isInitialized = useRef(false);
@@ -76,6 +88,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     setUsuarioState(user);
   };
+
+  const carregarConsultas = useCallback(async () => {
+    if (!usuario || usuario.tipoUsuario !== "Paciente" || !usuario.id) {
+        setConsultasUsuario([]);
+        return;
+    }
+    
+    setIsConsultasLoading(true);
+    
+    try {
+        const consultasData = await buscarConsultasPorPacienteId(usuario.id);
+        setConsultasUsuario(consultasData); 
+    } catch (error) {
+        console.error("Erro ao carregar consultas:", error);
+        setConsultasUsuario([]); // Em caso de falha, define como array vazio
+    } finally {
+        setIsConsultasLoading(false);
+    }
+  }, [usuario]);
 
   const carregarPlanoUsuario = useCallback(async () => {
     if (
@@ -140,6 +171,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (planoUsuario !== null) setPlanoUsuario(null);
       if (planoInexistente !== false) setPlanoInexistente(false);
       if (isPlanoLoading) setIsPlanoLoading(false);
+      if (isAuthReady && usuario && usuario.tipoUsuario === "Paciente" && consultasUsuario === null) {
+        carregarConsultas();
+    }
     }
   }, [
     isAuthReady,
@@ -147,6 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     planoUsuario,
     isPlanoLoading,
     planoInexistente,
+    carregarPlanoUsuario
   ]);
 
   return (
@@ -156,6 +191,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUsuario,
         planoUsuario,
         setPlanoUsuario,
+        carregarPlanoUsuario,
+        consultasUsuario,
+        setConsultasUsuario,
+        carregarConsultas,
+        isConsultasLoading,
         isAuthenticated,
         isAuthReady,
         isPlanoLoading,

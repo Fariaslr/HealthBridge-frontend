@@ -48,8 +48,6 @@ export async function cadastrarNutricionista(dados: NutricionistaInput): Promise
   return response.data;
 }
 
-// Função unificada para a página de cadastro
-// Recebe o tipo de cadastro e os dados de entrada genéricos `CadastroInput`
 export async function cadastrarUsuario(tipo: TipoCadastro, dados: CadastroInput): Promise<Pessoa> {
   switch (tipo) {
     case "PACIENTE":

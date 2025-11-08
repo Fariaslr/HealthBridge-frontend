@@ -17,7 +17,7 @@ import PerfilPage from "./PerfilPage";
 export default function HomePage() {
   const tabs = ["Dashboard","Plano", "Avaliações", "Treinos", "Dietas","Perfil"];
   const { usuario } = useAuth();
-  const [activeTab, setActiveTab] = useState("Plano");
+  const [activeTab, setActiveTab] = useState("Avaliações");
 
   if (!usuario) {
     return <p>Carregando ou usuário não logado...</p>;

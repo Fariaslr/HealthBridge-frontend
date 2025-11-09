@@ -72,7 +72,7 @@ export default function PlanoPage() {
           </p>
 
           <p>
-            <b>Criação:</b>{" "}
+            <b>Criação:</b>
             {new Date(planoUsuario.dataCriacao).toLocaleString(
               'pt-BR',
               {

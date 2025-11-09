@@ -97,7 +97,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
     };
 
     const handleSave = async () => {
-        // 1. Validação de campos obrigatórios (Peso, Altura, Data, etc.)
         if (formData.peso <= 0 || formData.altura <= 0 || !formData.dataCriacao ) {
             console.error("Campos obrigatórios (Peso, Altura, e Data) devem ser preenchidos e positivos.");
             return;
@@ -107,22 +106,13 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
             return;
         }
 
-        // 2. Criação do Payload BASE
-        // Mapeamos os dados do formulário e garantimos que os números sejam passados
         const medidasPayload = {
             ...formData,
             peso: formData.peso as number,
             altura: formData.altura as number,
             numeroRefeicoes: formData.numeroRefeicoes as number,
-
-            // Remove campos indesejados se existirem no formData, mas não no DTO
-            // [Remova aqui se houver campos extras no formData que o DTO não aceita]
         };
-
-        // 3. Montagem do DTO Final (Baseado no modo)
         let finalPayload: ConsultaRecordDto;
-
-        // Assumindo que o profissionalSaudeId fixo é a regra:
         const profissionalId = "00867429-1ecb-43c1-ae9b-e71083324498";
 
         try {
@@ -131,15 +121,11 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                     throw new Error("ID da avaliação não encontrado para edição.");
                 }            
                 finalPayload = {
-                    ...medidasPayload, // Inclui todos os campos atualizados
-
-                    // MANTÉM a data de criação original
+                    ...medidasPayload,
                     dataCriacao: avaliacao.dataCriacao,
-                    // IDs: Mantemos os IDs originais
                     planoId: avaliacao.plano.id,
                     profissionalSaudeId: avaliacao.profissionalSaude.id,
-                } as ConsultaRecordDto; // Cast para forçar o DTO completo
-
+                } as ConsultaRecordDto;
                 const consultaAtualizada = await atualizarConsulta(avaliacao.id, finalPayload);
                 await carregarConsultas();
                 console.log("Consulta atualizada:", consultaAtualizada);
@@ -149,7 +135,7 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                     ...medidasPayload,
 
                     dataCriacao: formData.dataCriacao,
-                    dataAtualizacao: formData.dataCriacao, 
+
                     planoId: planoUsuario.id,
                     profissionalSaudeId: profissionalId,
                 } as ConsultaRecordDto;

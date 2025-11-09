@@ -18,18 +18,45 @@ import { Visibility, Edit, Delete } from "@mui/icons-material";
 import type { Consulta } from "../models/Consulta";
 import { AvaliacaoModalForm } from "../components/ModalAvaliacaoForm";
 import { useAuth } from "../context/AuthContext";
+import { deletarConsulta } from "../services/consultaService";
 
 export default function AvaliacaoPage() {
   const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(null);
   const { carregarConsultas, consultasUsuario, isConsultasLoading } = useAuth();
 
   const [openAvaliacaoModal, setOpenAvaliacaoModal] = useState(false);
-  const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState(null);
+  const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState<Consulta | null>(null);
 
   const handleOpen = () => {
     setAvaliacaoParaEditar(null);
     setOpenAvaliacaoModal(true);
   };
+
+  const handleEdit = (consulta: Consulta) => {
+    setAvaliacaoParaEditar(consulta);
+    setOpenAvaliacaoModal(true);
+  };
+
+  const handleDelete = async (consultaId: string) => {
+    const confirmar = window.confirm("Tem certeza que deseja excluir esta avaliação? Esta ação é irreversível.");
+
+    if (confirmar) {
+      try {
+        await deletarConsulta(consultaId);
+        await carregarConsultas();
+
+        if (consultaSelecionada?.id === consultaId) {
+          setConsultaSelecionada(null);
+        }
+
+        console.log(`Consulta ${consultaId} excluída com sucesso.`);
+
+      } catch (error) {
+        console.error("Falha ao excluir a avaliação:", error);
+        alert("Ocorreu um erro ao excluir a avaliação. Tente novamente.");
+      }
+    }
+  }
 
   useEffect(() => {
     if (consultasUsuario === null) {
@@ -48,6 +75,15 @@ export default function AvaliacaoPage() {
       carregarConsultas();
     }
   }, [consultasUsuario, carregarConsultas]);
+
+  const consultasOrdenadas = consultasUsuario
+    ? [...consultasUsuario].sort((a, b) => {
+        const dataA = new Date(a.dataCriacao).getTime();
+        const dataB = new Date(b.dataCriacao).getTime();
+        
+        return dataB - dataA;
+    })
+    : null;
 
   if (isConsultasLoading) {
     return <p>Carregando avaliações...</p>;
@@ -69,32 +105,46 @@ export default function AvaliacaoPage() {
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
-                <TableCell>Profissional</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>Peso</TableCell>
+                <TableCell>Altura</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {consultasUsuario?.map((c) => (
+              {consultasOrdenadas?.map((c) => (
                 <TableRow
                   key={c.id}
                   hover
                   onClick={() => setConsultaSelecionada(c)}
                   sx={{ cursor: "pointer" }}
                 >
-                  <TableCell>{c.dataCriacao}</TableCell>
-                  <TableCell>{c.profissionalSaude.nome || "Não identificado"}</TableCell>
-                  <TableCell>
-
-                  </TableCell>
+                  <TableCell>{new Date(c.dataCriacao).toLocaleString(
+                    'pt-BR',
+                    {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    }
+                  )}</TableCell>
+                  <TableCell>{c.peso} kg</TableCell>
+                  <TableCell>{c.altura} cm</TableCell>
                   <TableCell align="right">
                     <IconButton color="primary">
                       <Visibility />
                     </IconButton>
-                    <IconButton color="secondary">
+                    <IconButton color="secondary" onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(c);
+                    }}>
                       <Edit />
                     </IconButton>
-                    <IconButton color="error">
+                    <IconButton color="error" onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(c.id);
+                    }}>
                       <Delete />
                     </IconButton>
                   </TableCell>

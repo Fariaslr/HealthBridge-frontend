@@ -19,7 +19,7 @@ const treinosMock: Treino[] = [
 
 ];
 
-export default function TreinosPage() {
+export default function TreinoPage() {
   const [treinos, setTreinos] = useState<Treino[]>(treinosMock);
   const [treinoSelecionado, setTreinoSelecionado] = useState<Treino | null>(treinos[0]);
 

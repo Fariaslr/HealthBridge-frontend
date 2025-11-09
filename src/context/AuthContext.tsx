@@ -21,7 +21,7 @@ import { buscarPlanoPorPacienteId } from "../services/planoService";
 import type { Consulta } from "../models/Consulta";
 import { buscarConsultasPorPacienteId } from "../services/consultaService";
 
-type AuthUser =
+export type AuthUser =
   | Paciente
   | ProfissionalSaude
   | Pessoa

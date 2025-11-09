@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Visibility, Edit, Delete } from "@mui/icons-material";
 import type { Consulta } from "../models/Consulta";
-import { AvaliacaoModalForm } from "../components/ModalAvaliacaoForm";
+import { AvaliacaoModalForm } from "../components/modal/ModalAvaliacaoForm";
 import { useAuth } from "../context/AuthContext";
 import { deletarConsulta } from "../services/consultaService";
 
@@ -121,9 +121,6 @@ export default function AvaliacaoPage() {
                   <TableCell>{new Date(c.dataCriacao).toLocaleString(
                     'pt-BR',
                     {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric'
@@ -163,13 +160,20 @@ export default function AvaliacaoPage() {
                 Detalhes da Consulta
               </Typography>
               <Typography>
-                <strong>Data e horário:</strong> {consultaSelecionada.dataAtualizacao}
+                <strong>Data e horário:</strong> {new Date(consultaSelecionada.dataCriacao).toLocaleString(
+                    'pt-BR',
+                    {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    }
+                  )}
               </Typography>
               <Typography>
                 <strong>Profissional:</strong> {consultaSelecionada.profissionalSaude.nome}
-              </Typography>
-              <Typography>
-                <strong>Objetivo:</strong> {consultaSelecionada.plano.objetivo}
               </Typography>
               <Typography>
                 <strong>Anotações:</strong> {consultaSelecionada.observacoes}

@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import { PlanoModalForm } from "../components/ModalPlano";
+import { PlanoModalForm } from "../components/modal/ModalPlano";
 import { deletarPlano } from "../services/planoService";
 
 export default function PlanoPage() {

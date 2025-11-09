@@ -2,11 +2,11 @@ import {
     Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, RadioGroup, FormControlLabel, Radio, Grid, type SelectChangeEvent,
 } from "@mui/material";
 import React, { useState, useEffect, type FC } from "react";
-import type { Objetivo } from "../models/Objetivo";
-import type { NivelAtividadeFisica } from "../models/NivelAtividadeFisica";
-import type { Plano } from "../models/Plano";
-import { useAuth } from "../context/AuthContext";
-import { atualizarPlano, criarPlano, type PlanoRecordDto } from "../services/planoService";
+import type { Objetivo } from "../../models/Objetivo";
+import type { NivelAtividadeFisica } from "../../models/NivelAtividadeFisica";
+import type { Plano } from "../../models/Plano";
+import { useAuth } from "../../context/AuthContext";
+import { atualizarPlano, criarPlano, type PlanoRecordDto } from "../../services/planoService";
 
 
 const OBJETIVOS_DISPLAY: Record<Objetivo, string> = {

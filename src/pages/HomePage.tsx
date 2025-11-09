@@ -7,17 +7,18 @@ import {
 
 import { useState } from "react";
 import Plano from "./PlanoPage";
-import Treinos from "./TreinosPage";
+import Treinos from "./TreinoPage";
 import Dietas from "./DietaPage";
 import Dashboard from "./DashboardPage";
 import AvaliacaoPage from "./AvaliacaoPage";
 import PerfilPage from "./PerfilPage";
+import TreinoPage from "./TreinoPage";
 
 
 export default function HomePage() {
   const tabs = ["Dashboard","Plano", "Avaliações", "Treinos", "Dietas","Perfil"];
   const { usuario } = useAuth();
-  const [activeTab, setActiveTab] = useState("Avaliações");
+  const [activeTab, setActiveTab] = useState("Perfil");
 
   if (!usuario) {
     return <p>Carregando ou usuário não logado...</p>;
@@ -27,7 +28,7 @@ export default function HomePage() {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box mb={4}>
         <Typography variant="h5" fontWeight="bold">
-          Olá, {usuario.nome} {usuario.sobrenome}
+          Olá, {usuario.nome}
         </Typography>
       </Box>
       <Box>
@@ -64,7 +65,7 @@ export default function HomePage() {
           {activeTab === "Dashboard" && <Dashboard />}
           {activeTab === "Plano" && <Plano />}
           {activeTab === "Avaliações" && <AvaliacaoPage />}
-          {activeTab === "Treinos" && <Treinos />}
+          {activeTab === "Treinos" && <TreinoPage />}
           {activeTab === "Dietas" && <Dietas />}
           {activeTab === "Perfil" && <PerfilPage />}
         </Box>

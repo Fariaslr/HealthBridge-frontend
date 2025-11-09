@@ -8,10 +8,10 @@ import {
     IconButton
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import type { Consulta } from '../models/Consulta';
+import type { Consulta } from '../../models/Consulta';
 import { useEffect, useState, type FC } from "react";
-import { useAuth } from "../context/AuthContext";
-import { atualizarConsulta, criarConsulta, type ConsultaRecordDto } from "../services/consultaService";
+import { useAuth } from "../../context/AuthContext";
+import { atualizarConsulta, criarConsulta, type ConsultaRecordDto } from "../../services/consultaService";
 
 const initialFormData = {
     peso: 0,

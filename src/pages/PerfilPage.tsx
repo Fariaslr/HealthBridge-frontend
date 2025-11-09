@@ -1,88 +1,119 @@
+import { Box, Card, CardContent, Grid, Typography, Divider, Button } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
-import ModalEdicao from "../components/ModalPerfil";
-import InfoItem from "../components/InfoItem";
+import React, { useState } from 'react';
+import { PerfilModalForm } from "../components/modal/ModalPerfilForm";
 
 export default function PerfilPage() {
-  const { usuario, setUsuario } = useAuth();
-  const [campoSelecionado, setCampoSelecionado] = useState<string | null>(null);
+    const { usuario, isAuthReady } = useAuth();
 
-  if (!usuario) {
-    return (
-      <div>
-        <p >Carregando perfil ou usuário não autenticado.</p>
-      </div>
+    const [openModal, setOpenModal] = useState(false);
+
+    const handleOpen = () => setOpenModal(true);
+    const handleClose = () => setOpenModal(false);
+
+    if (!isAuthReady) {
+        return <p>Carregando dados do perfil...</p>;
+    }
+
+    if (!usuario) {
+        return <p>Nenhum usuário logado. Redirecionando...</p>;
+    }
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'Não informado';
+        try {
+            const dateOnly = dateString.split('T')[0];
+            return new Date(dateOnly).toLocaleDateString('pt-BR');
+        } catch (e) {
+            return dateString;
+        }
+    };
+
+    // Função para renderizar um campo com título e valor
+    const renderField = (title: string, value: string | number | null | undefined) => (
+        <Box mb={2}>
+            <Typography variant="subtitle2" color="text.secondary">{title}</Typography>
+            <Typography variant="body1" fontWeight="medium">
+                {value || 'Não informado'}
+            </Typography>
+        </Box>
     );
-  }
 
-  const obterValorAtual = (campo: string): string | number => {
-    const partes = campo.split(".");
-    let valor: any = usuario;
+    return (
+        <Grid container >
+            <Grid size={{ xs: 12, md: 12 }}>
+                <Card>
+                    <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                            <Typography variant="h5">
+                                Dados Pessoais
+                            </Typography>
 
-    for (const parte of partes) {
-      if (valor === null || valor === undefined) return "N/A";
-      valor = valor[parte];
-    }
+                            {/* 🚀 BOTÃO DE EDIÇÃO */}
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleOpen} // Chama a função para abrir o modal
+                                size="small"
+                            >
+                                Editar Perfil
+                            </Button>
+                        </Box>
+                        <Divider sx={{ mb: 3 }} />
+                        <Grid container>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                {renderField("CPF", usuario.cpf)}
+                            </Grid>
 
-    if (campo.includes("dataNascimento") && valor) {
-      try {
-        return new Date(valor).toLocaleDateString('pt-BR');
-      } catch (e) {
-        return valor;
-      }
-    }
-    return valor || "N/A";
-  };
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                {renderField("Nome Completo", `${usuario.nome} ${usuario.sobrenome}`)}
+                            </Grid>                           
+                        </Grid>
 
-  const abrirModal = (campo: string) => {
-    setCampoSelecionado(campo);
-  };
+                        <Divider sx={{ my: 3 }} />
 
-  const fecharModal = () => {
-    setCampoSelecionado(null);
-  };
+                        <Grid container >
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                {renderField("Data de Nascimento", formatDate(usuario.dataNascimento))}
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                {renderField("Sexo", usuario.sexo)}
+                            </Grid>
 
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                {renderField("Data de Nascimento", formatDate(usuario.dataNascimento))}
+                            </Grid>
 
-  const salvarValor = (campo: string, novoValor: string | number) => {
-    const partes = campo.split(".");
-    const novoUsuario = { ...usuario };
-
-    let alvo: any = novoUsuario;
-    for (let i = 0; i < partes.length - 1; i++) {
-      alvo = alvo[partes[i]];
-    }
-
-    alvo[partes[partes.length - 1]] = novoValor;
-    setUsuario(novoUsuario);
-    fecharModal();
-  };
+                            {/* 🚀 CAMPOS ESPECÍFICOS DE PROFISSIONAL */}
+                            {(usuario.tipoUsuario === 'EducadorFisico') && (
+                                <Grid size={{ xs: 12, md: 12 }}>
+                                    {/* Assumindo que o campo 'cref' existe em EducadorFisico */}
+                                    {renderField("CREF/Registro", (usuario as any).cref || (usuario as any).crn)}
+                                </Grid>
+                            )}
+                        </Grid>
 
 
-  return (
-    <div >
-      <div >
-        <h2>Meu Perfil</h2>
-        <InfoItem
-            label="Nome Completo"
-            value={usuario.nome + " " + usuario.sobrenome}
-          />
+                        <Divider sx={{ my: 3 }} />
 
-          <InfoItem
-            label="Cpf"
-            value={usuario.cpf }
-          />
-        <h3 >Endereço</h3>
-        
+                        {/* --- INFORMAÇÕES DE CONTATO --- */}
+                        <Grid container spacing={0}>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                {renderField("E-mail", usuario.email)}
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                {renderField("Telefone", usuario.telefone)}
+                            </Grid>
+                        </Grid>
 
-        {campoSelecionado && (
-          <ModalEdicao
-            campo={campoSelecionado}
-            valor={obterValorAtual(campoSelecionado)}
-            onClose={fecharModal}
-            onSalvar={salvarValor}
-          />
-        )}
-      </div>
-    </div>
-  );
+
+                    </CardContent>
+                </Card>
+            </Grid>
+            <PerfilModalForm
+                open={openModal}
+                onClose={handleClose}
+                usuario={usuario} // Passa o objeto usuário atual
+            />
+        </Grid>
+    );
 }

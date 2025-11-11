@@ -16,7 +16,7 @@ import { atualizarConsulta, criarConsulta, type ConsultaRecordDto } from "../../
 const initialFormData = {
     peso: 0,
     altura: 0,
-    dataCriacao: new Date().toISOString(),
+    dataConsulta: new Date().toISOString().substring(0, 16),
     numeroRefeicoes: 0,
     torax: 0,
     abdomen: 0,
@@ -58,9 +58,9 @@ const style = {
     p: 4,
 };
 
-type AvaliacaoFormData = Omit<Consulta, 'id' | 'plano' | 'profissionalSaude' | 'dataCriacao' | 'dataAtualizacao'> & {
+type AvaliacaoFormData = Omit<Consulta, 'id' | 'plano' | 'profissionalSaude'> & {
     observacoes: string;
-    dataCriacao: string;
+    dataConsulta: string;
 };
 
 export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose, avaliacao }) => {
@@ -78,7 +78,7 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                 observacoes: avaliacao.observacoes || '',
             });
         } else {
-            setFormData(initialFormData);
+            setFormData(initialFormData as AvaliacaoFormData);
         }
     }, [avaliacao, isEditing]);
 
@@ -90,69 +90,99 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: name !== 'observacoes' ? (value === '' ? null : Number(value)) : value,
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSave = async () => {
-        if (formData.peso <= 0 || formData.altura <= 0 || !formData.dataCriacao ) {
-            console.error("Campos obrigatórios (Peso, Altura, e Data) devem ser preenchidos e positivos.");
-            return;
-        }
-        if (!planoUsuario?.id || !usuario?.id) {
-            console.error("Plano ou Usuário ID ausente. Não é possível criar a consulta.");
+        const profissionalIdFallback = "00867429-1ecb-43c1-ae9b-e71083324498";
+
+        // 🟠 Validação inicial
+        if (formData.peso <= 0 || formData.altura <= 0 || !formData.dataConsulta) {
+            alert("Campos obrigatórios (Peso, Altura e Data) devem ser preenchidos e positivos.");
             return;
         }
 
+        if (!planoUsuario?.id || !usuario?.id) {
+            console.error("Plano ou Usuário ID ausente. Não é possível salvar a consulta.");
+            return;
+        }
+
+        // 🟢 Converte data local para formato ISO (UTC)
+        let dataConsultaISO = "";
+        try {
+            dataConsultaISO = new Date(formData.dataConsulta).toISOString();
+        } catch {
+            alert("Data de consulta inválida.");
+            return;
+        }
+
+        // 🧹 Normaliza e sanitiza os dados
         const medidasPayload = {
             ...formData,
-            peso: formData.peso as number,
-            altura: formData.altura as number,
-            numeroRefeicoes: formData.numeroRefeicoes as number,
+            peso: Number(formData.peso),
+            altura: Number(formData.altura),
+            numeroRefeicoes: Number(formData.numeroRefeicoes),
         };
-        let finalPayload: ConsultaRecordDto;
-        const profissionalId = "00867429-1ecb-43c1-ae9b-e71083324498";
+
+        const sanitizedPayload = Object.entries(medidasPayload).reduce(
+            (acc, [key, value]) => {
+                if (key === "dataConsulta") return acc;
+                if (typeof value === "string" && value.trim() === "") {
+                    acc[key] = null;
+                } else {
+                    acc[key] = value;
+                }
+                return acc;
+            },
+            {} as Record<string, any>
+        );
 
         try {
+            let finalPayload: Partial<ConsultaRecordDto>;
+
             if (isEditing) {
-                if (!avaliacao || !avaliacao.id) {
-                    throw new Error("ID da avaliação não encontrado para edição.");
-                }            
-                finalPayload = {
-                    ...medidasPayload,
-                    dataCriacao: avaliacao.dataCriacao,
-                    planoId: avaliacao.plano.id,
-                    profissionalSaudeId: avaliacao.profissionalSaude.id,
-                } as ConsultaRecordDto;
-                const consultaAtualizada = await atualizarConsulta(avaliacao.id, finalPayload);
-                await carregarConsultas();
-                console.log("Consulta atualizada:", consultaAtualizada);
+                // 🔵 Atualização
+                if (!avaliacao?.id) {
+                    throw new Error("Avaliação inválida para edição.");
+                }
 
+                const planoIdToUse =
+                    (avaliacao as any).plano?.id ||
+                    (avaliacao as any).planoId ||
+                    planoUsuario?.id;
+
+
+                finalPayload = {
+                    ...sanitizedPayload,
+                    dataConsulta: dataConsultaISO,
+                    planoId: planoIdToUse,
+                    profissionalSaudeId: planoUsuario.profissionalSaude.id || profissionalIdFallback,
+                };
+
+                console.log("Payload de atualização:", finalPayload);
+                await atualizarConsulta(avaliacao.id, finalPayload as ConsultaRecordDto);
             } else {
+                // 🟢 Criação
                 finalPayload = {
-                    ...medidasPayload,
+                    ...sanitizedPayload,
+                    dataConsulta: dataConsultaISO,
+                    planoId: planoUsuario!.id,
+                    profissionalSaudeId: planoUsuario!.profissionalSaude.id || profissionalIdFallback,
+                };
 
-                    dataCriacao: formData.dataCriacao,
-
-                    planoId: planoUsuario.id,
-                    profissionalSaudeId: profissionalId,
-                } as ConsultaRecordDto;
-
-                const novaConsulta = await criarConsulta(finalPayload);
-                await carregarConsultas();
-                console.log("Nova consulta criada:", novaConsulta);
+                console.log("Payload de criação:", finalPayload);
+                await criarConsulta(finalPayload as ConsultaRecordDto);
             }
 
-            // 5. Fecha o modal
+            await carregarConsultas();
             handleCloseAndClean();
-
-        } catch (error) {
-            console.error("Falha ao salvar a avaliação:", error);
-            // Implementar feedback de erro aqui
+        } catch (error: any) {
+            console.error("Falha ao salvar a avaliação:", error.response?.data || error);
+            alert("Falha ao salvar a avaliação. Verifique o console para mais detalhes.");
         }
     };
+
+
 
     return (
         <Modal open={open} onClose={handleCloseAndClean}>
@@ -174,7 +204,25 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                 </Typography>
 
                 <Grid container spacing={1} size={{ xs: 12, md: 12 }}>
-                    <Grid size={{ xs: 3, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                            fullWidth
+                            label="Data da Consulta"
+                            name="dataConsulta"
+                            type="datetime-local"
+                            value={formData.dataConsulta}
+                            onChange={handleChange}
+                            required
+                            size="small"
+                            slotProps={{
+                                inputLabel: {
+                                    shrink: true
+                                }
+                            }}
+                        />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 3 }}>
                         <TextField
                             fullWidth
                             label="Peso"
@@ -189,7 +237,7 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                             }}
                         />
                     </Grid>
-                    <Grid size={{ xs: 3, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 3 }}>
                         <TextField
                             fullWidth
                             label="Altura"
@@ -198,32 +246,7 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                             value={formData.altura === 0 ? '' : formData.altura || ''}
                             onChange={handleChange}
                             required
-                            size="small" // ✅ CORRIGIDO
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 3, md: 3 }}>
-                        <TextField
-                            fullWidth
-                            label="Data da Consulta"
-                            name="dataConsulta"
-                            type="datetime-local" // Melhor para data e hora juntas
-                            value={formData.dataCriacao}
-                            onChange={handleChange}
-                            required
                             size="small"
-                            // Garante que o input de data/hora funciona corretamente
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 3, md: 3 }}>
-                        <TextField
-                            fullWidth
-                            label="Pescoço (Circunferência)"
-                            name="pescoco"
-                            type="number"
-                            value={formData.pescoco || ''}
-                            onChange={handleChange}
-                            size="small" // ✅ CORRIGIDO
                         />
                     </Grid>
 
@@ -232,40 +255,50 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                         <Typography variant="subtitle1">Medidas de Tronco (cm)</Typography>
                     </Grid>
 
-                    {/* LINHA 3: Tórax, Cintura, Abdômen, Quadril */}
-                    <Grid size={{ xs: 12, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <TextField
+                            fullWidth
+                            label="Pescoço "
+                            name="pescoco"
+                            type="number"
+                            value={formData.pescoco || ''}
+                            onChange={handleChange}
+                            size="small"
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <TextField fullWidth label="Tórax" name="torax" type="number" value={formData.torax || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
-                    <Grid size={{ xs: 12, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <TextField fullWidth label="Cintura" name="cintura" type="number" value={formData.cintura || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
-                    <Grid size={{ xs: 12, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <TextField fullWidth label="Abdômen" name="abdomen" type="number" value={formData.abdomen || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
-                    <Grid size={{ xs: 12, md: 3 }}>
+
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <TextField fullWidth label="Quadril" name="quadril" type="number" value={formData.quadril || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
 
-                    {/* LINHA 4: Título Membros Superiores */}
                     <Grid size={{ xs: 12 }}>
                         <Typography variant="subtitle1">Membros Superiores (cm)</Typography>
                     </Grid>
 
                     {/* LINHA 5: Braços e Antebraços */}
-                    <Grid size={{ xs: 3 }}>
-                        <TextField fullWidth label="Braço Direito" name="bracoDireito" type="number" value={formData.bracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 3 }}>
+
+                    <Grid size={{ xs: 6, md: 6 }}>
                         <TextField fullWidth label="Braço Esquerdo" name="bracoEsquerdo" type="number" value={formData.bracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
-                    <Grid size={{ xs: 3 }}>
-                        <TextField fullWidth label="Antebraço Direito" name="antibracoDireito" type="number" value={formData.antibracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                    <Grid size={{ xs: 6, md: 6 }}>
+                        <TextField fullWidth label="Braço Direito" name="bracoDireito" type="number" value={formData.bracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
-                    <Grid size={{ xs: 3 }}>
+                    <Grid size={{ xs: 6, md: 6 }}>
                         <TextField fullWidth label="Antebraço Esquerdo" name="antibracoEsquerdo" type="number" value={formData.antibracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
                     </Grid>
+                    <Grid size={{ xs: 6, md: 6 }}>
+                        <TextField fullWidth label="Antebraço Direito" name="antibracoDireito" type="number" value={formData.antibracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                    </Grid>
 
-                    {/* LINHA 6: Título Membros Inferiores */}
                     <Grid size={{ xs: 12 }}>
                         <Typography variant="subtitle1" >Membros Inferiores (cm)</Typography>
                     </Grid>

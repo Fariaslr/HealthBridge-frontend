@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Visibility, Edit, Delete } from "@mui/icons-material";
 import type { Consulta } from "../models/Consulta";
-import { AvaliacaoModalForm } from "../components/modal/ModalAvaliacaoForm";
+import { AvaliacaoModalForm } from "../components/modal/ModalAvaliacao";
 import { useAuth } from "../context/AuthContext";
 import { deletarConsulta } from "../services/consultaService";
 
@@ -104,9 +104,10 @@ export default function AvaliacaoPage() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Data</TableCell>
-                <TableCell>Peso</TableCell>
-                <TableCell>Altura</TableCell>
+                <TableCell align="left">Data</TableCell>
+                <TableCell align="center">Peso</TableCell>
+                <TableCell align="center">Altura</TableCell>
+                <TableCell align="center">Calorias diárias</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -118,16 +119,20 @@ export default function AvaliacaoPage() {
                   onClick={() => setConsultaSelecionada(c)}
                   sx={{ cursor: "pointer" }}
                 >
-                  <TableCell>{new Date(c.dataCriacao).toLocaleString(
+                  <TableCell align="left">{new Date(c.dataCriacao).toLocaleString(
                     'pt-BR',
                     {
                       day: '2-digit',
                       month: '2-digit',
-                      year: 'numeric'
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
                     }
                   )}</TableCell>
-                  <TableCell>{c.peso} kg</TableCell>
-                  <TableCell>{c.altura} cm</TableCell>
+                  <TableCell align="center">{c.peso} kg</TableCell>
+                  <TableCell align="center">{c.altura} cm</TableCell>
+                  <TableCell align="center">{c.caloriasDiarias?.toFixed(0)} kcal</TableCell>
                   <TableCell align="right">
                     <IconButton color="primary">
                       <Visibility />
@@ -173,7 +178,7 @@ export default function AvaliacaoPage() {
                   )}
               </Typography>
               <Typography>
-                <strong>Profissional:</strong> {consultaSelecionada.profissionalSaude.nome}
+
               </Typography>
               <Typography>
                 <strong>Anotações:</strong> {consultaSelecionada.observacoes}

@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Grid, Typography, Divider, Button } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import React, { useState } from 'react';
-import { PerfilModalForm } from "../components/modal/ModalPerfilForm";
+import { useState } from 'react';
+import { PerfilModalForm } from "../components/modal/ModalPerfil";
 
 export default function PerfilPage() {
     const { usuario, isAuthReady } = useAuth();
@@ -18,17 +18,22 @@ export default function PerfilPage() {
     if (!usuario) {
         return <p>Nenhum usuário logado. Redirecionando...</p>;
     }
+    
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'Não informado';
         try {
-            const dateOnly = dateString.split('T')[0];
-            return new Date(dateOnly).toLocaleDateString('pt-BR');
-        } catch (e) {
+            const [year, month, day] = dateString.split('T')[0].split('-');
+            return new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                timeZone: 'UTC'
+            }).format(new Date(Date.UTC(+year, +month - 1, +day)));
+        } catch {
             return dateString;
         }
     };
 
-    // Função para renderizar um campo com título e valor
     const renderField = (title: string, value: string | number | null | undefined) => (
         <Box mb={2}>
             <Typography variant="subtitle2" color="text.secondary">{title}</Typography>
@@ -47,18 +52,18 @@ export default function PerfilPage() {
                             <Typography variant="h5">
                                 Dados Pessoais
                             </Typography>
-
-                            {/* 🚀 BOTÃO DE EDIÇÃO */}
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={handleOpen} // Chama a função para abrir o modal
+                                onClick={handleOpen}
                                 size="small"
                             >
                                 Editar Perfil
                             </Button>
                         </Box>
-                        <Divider sx={{ mb: 3 }} />
+
+                        <Divider sx={{ my: 1, mb: 1 }} />
+
                         <Grid container>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 {renderField("CPF", usuario.cpf)}
@@ -66,36 +71,28 @@ export default function PerfilPage() {
 
                             <Grid size={{ xs: 12, md: 4 }}>
                                 {renderField("Nome Completo", `${usuario.nome} ${usuario.sobrenome}`)}
-                            </Grid>                           
+                            </Grid>
                         </Grid>
 
-                        <Divider sx={{ my: 3 }} />
+                        <Divider sx={{ my: 1 }} />
 
                         <Grid container >
-                            <Grid size={{ xs: 12, md: 4 }}>
-                                {renderField("Data de Nascimento", formatDate(usuario.dataNascimento))}
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                {renderField("Data de Nascimento", formatDate(usuario.dataNascimento))} 
                             </Grid>
-                            <Grid size={{ xs: 12, md: 4 }}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 {renderField("Sexo", usuario.sexo)}
                             </Grid>
 
-                            <Grid size={{ xs: 12, md: 4 }}>
-                                {renderField("Data de Nascimento", formatDate(usuario.dataNascimento))}
-                            </Grid>
-
-                            {/* 🚀 CAMPOS ESPECÍFICOS DE PROFISSIONAL */}
                             {(usuario.tipoUsuario === 'EducadorFisico') && (
                                 <Grid size={{ xs: 12, md: 12 }}>
-                                    {/* Assumindo que o campo 'cref' existe em EducadorFisico */}
                                     {renderField("CREF/Registro", (usuario as any).cref || (usuario as any).crn)}
                                 </Grid>
                             )}
                         </Grid>
 
+                        <Divider sx={{ my: 1 }} />
 
-                        <Divider sx={{ my: 3 }} />
-
-                        {/* --- INFORMAÇÕES DE CONTATO --- */}
                         <Grid container spacing={0}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 {renderField("E-mail", usuario.email)}
@@ -104,15 +101,13 @@ export default function PerfilPage() {
                                 {renderField("Telefone", usuario.telefone)}
                             </Grid>
                         </Grid>
-
-
                     </CardContent>
                 </Card>
             </Grid>
             <PerfilModalForm
                 open={openModal}
                 onClose={handleClose}
-                usuario={usuario} // Passa o objeto usuário atual
+                usuario={usuario}
             />
         </Grid>
     );

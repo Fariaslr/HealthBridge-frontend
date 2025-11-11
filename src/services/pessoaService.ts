@@ -7,9 +7,18 @@ const API_BASE = "http://localhost:8080";
 export type PessoaUpdateDto = {
     nome: string;
     sobrenome: string;
+    email?: string | null;
     telefone?: string | null;
-    [key: string]: any; 
+    cpf?: string | null;
+    sexo?: string | null;
+    dataNascimento?: string | null;
+    cref?: string | null;
+    crn?: string | null;
+    cep?: string | null;
+    numero?: string | null;
+    complemento?: string | null;
 };
+
 
 export async function atualizarPessoa(id: string, dto: PessoaUpdateDto): Promise<AuthUser> {
     const response = await axios.put<Pessoa>(`${API_BASE}/pessoas/${id}`, dto); 

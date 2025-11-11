@@ -7,7 +7,6 @@ import {
 
 import { useState } from "react";
 import Plano from "./PlanoPage";
-import Treinos from "./TreinoPage";
 import Dietas from "./DietaPage";
 import Dashboard from "./DashboardPage";
 import AvaliacaoPage from "./AvaliacaoPage";

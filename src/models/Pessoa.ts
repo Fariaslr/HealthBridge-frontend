@@ -16,4 +16,5 @@ export type Pessoa = {
   tipoUsuario: "Paciente" | "Nutricionista" | "EducadorFisico";
   endereco: Endereco;
   plano: Plano | null;
+  idade: number;
 };

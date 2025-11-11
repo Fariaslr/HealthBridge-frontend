@@ -28,4 +28,5 @@ export interface Consulta {
     medidaPanturrilha?: string; 
     medidaBraço?: string;
     medidaCoxa?: string;
+    caloriasDiarias?: number;
 }

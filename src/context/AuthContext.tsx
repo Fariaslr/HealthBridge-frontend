@@ -15,11 +15,12 @@ import type { Paciente } from "../models/Paciente";
 import type { ProfissionalSaude } from "../models/ProfissionalSaude";
 import type { Nutricionista } from "../models/Nutricionista";
 import type { EducadorFisico } from "../models/EducadorFisico";
-
 import type { Plano } from "../models/Plano";
-import { buscarPlanoPorPacienteId } from "../services/planoService";
 import type { Consulta } from "../models/Consulta";
+import type { Treino } from "../models/Treino";
+import { buscarTreinosPorPaciente, buscarTreinosPorProfissional } from "../services/treinoService";
 import { buscarConsultasPorPacienteId } from "../services/consultaService";
+import { buscarPlanoPorPacienteId } from "../services/planoService";
 
 export type AuthUser =
   | Paciente
@@ -39,7 +40,12 @@ type AuthContextType = {
   setConsultasUsuario: Dispatch<SetStateAction<Consulta[] | null>>;
   carregarConsultas: () => Promise<void>;
   isConsultasLoading: boolean;
-  
+
+  treinosUsuario: Treino[] | null;
+  setTreinosUsuario: Dispatch<SetStateAction<Treino[] | null>>;
+  carregarTreinos: () => Promise<void>;
+  isTreinosLoading: boolean;
+
   isAuthenticated: boolean;
   isAuthReady: boolean;
   isPlanoLoading: boolean;
@@ -57,6 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [consultasUsuario, setConsultasUsuario] = useState<Consulta[] | null>(null);
   const [isConsultasLoading, setIsConsultasLoading] = useState(false);
+
+  const [treinosUsuario, setTreinosUsuario] = useState<Treino[] | null>(null);
+  const [isTreinosLoading, setIsTreinosLoading] = useState(false);
 
   const isAuthenticated = !!usuario;
   const isInitialized = useRef(false);
@@ -91,22 +100,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const carregarConsultas = useCallback(async () => {
     if (!usuario || usuario.tipoUsuario !== "Paciente" || !usuario.id) {
-        setConsultasUsuario([]);
-        return;
+      setConsultasUsuario([]);
+      return;
     }
-    
+
     setIsConsultasLoading(true);
-    
+
     try {
-        const consultasData = await buscarConsultasPorPacienteId(usuario.id);
-        setConsultasUsuario(consultasData); 
+      const consultasData = await buscarConsultasPorPacienteId(usuario.id);
+      setConsultasUsuario(consultasData);
     } catch (error) {
-        console.error("Erro ao carregar consultas:", error);
-        setConsultasUsuario([]); // Em caso de falha, define como array vazio
+      console.error("Erro ao carregar consultas:", error);
+      setConsultasUsuario([]);
     } finally {
-        setIsConsultasLoading(false);
+      setIsConsultasLoading(false);
     }
   }, [usuario]);
+
+  const carregarTreinos = useCallback(async () => {
+    if (!usuario || !usuario.id) {
+      setTreinosUsuario([]);
+      return;
+    }
+
+    setIsTreinosLoading(true);
+
+    try {
+
+      let treinos = [];
+      if (usuario.tipoUsuario == "Paciente") {
+        treinos = await buscarTreinosPorPaciente(usuario.id);
+        setTreinosUsuario(treinos);
+      } else {
+        treinos = await buscarTreinosPorProfissional(usuario.id);
+      }
+      setTreinosUsuario(treinos);
+    } catch (error) {
+      console.error("Erro ao carregar treinos:", error);
+      setTreinosUsuario([]);
+    } finally {
+      setIsTreinosLoading(false);
+    }
+  }, [usuario]);
+
 
   const carregarPlanoUsuario = useCallback(async () => {
     if (
@@ -155,34 +191,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [usuario, isPlanoLoading, planoUsuario, planoInexistente]);
 
   useEffect(() => {
-    if (
-      isAuthReady &&
-      usuario &&
-      usuario.tipoUsuario === "Paciente" &&
-      !planoUsuario &&
-      !isPlanoLoading &&
-      !planoInexistente
-    ) {
-      carregarPlanoUsuario();
-    } else if (
-      isAuthReady &&
-      (!usuario || usuario.tipoUsuario !== "Paciente")
-    ) {
-      if (planoUsuario !== null) setPlanoUsuario(null);
-      if (planoInexistente !== false) setPlanoInexistente(false);
-      if (isPlanoLoading) setIsPlanoLoading(false);
-      if (isAuthReady && usuario && usuario.tipoUsuario === "Paciente" && consultasUsuario === null) {
+    if (!isAuthReady || !usuario) return;
+
+    // Se for paciente, carrega plano, consultas e treinos
+    if (usuario.tipoUsuario === "Paciente") {
+      if (!planoUsuario && !isPlanoLoading && !planoInexistente) {
+        carregarPlanoUsuario();
+      }
+      if (consultasUsuario === null) {
         carregarConsultas();
-    }
+      }
+      if (treinosUsuario === null) {
+        carregarTreinos();
+      }
+    } else {
+      if (treinosUsuario === null) {
+        carregarTreinos();
+      }
     }
   }, [
     isAuthReady,
     usuario,
     planoUsuario,
+    consultasUsuario,
+    treinosUsuario,
     isPlanoLoading,
     planoInexistente,
-    carregarPlanoUsuario
+    carregarPlanoUsuario,
+    carregarConsultas,
+    carregarTreinos,
   ]);
+
 
   return (
     <AuthContext.Provider
@@ -196,6 +235,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setConsultasUsuario,
         carregarConsultas,
         isConsultasLoading,
+        treinosUsuario,
+        setTreinosUsuario,
+        carregarTreinos,
+        isTreinosLoading,
         isAuthenticated,
         isAuthReady,
         isPlanoLoading,

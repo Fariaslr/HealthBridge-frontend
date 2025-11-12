@@ -1,27 +1,52 @@
-import { Delete, Edit, Visibility } from "@mui/icons-material";
-import { Button, Card, CardContent, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { use, useState } from "react";
-
-type Exercício = {
-  nome: string;
-  series: number;
-};
-
-type Treino = {
-  data: string;
-  hora: string;
-  titulo: string;
-  tipo: string;
-  exercicios: Exercício[];
-  notas?: string;
-};
-const treinosMock: Treino[] = [
-
-];
+import {
+  Delete,
+  Edit,
+  Visibility,
+} from "@mui/icons-material";
+import {
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import type { Treino } from "../models/Treino";
+import { useAuth } from "../context/AuthContext";
 
 export default function TreinoPage() {
-  const [treinos, setTreinos] = useState<Treino[]>(treinosMock);
-  const [treinoSelecionado, setTreinoSelecionado] = useState<Treino | null>(treinos[0]);
+  const { treinosUsuario, carregarTreinos, isTreinosLoading } = useAuth();
+
+  useEffect(() => {
+    carregarTreinos();
+  }, [carregarTreinos]);
+  
+  const [treinos, setTreinos] = useState<Treino[]>([]);
+  const [treinoSelecionado, setTreinoSelecionado] = useState<Treino | null>(null);
+
+  useEffect(() => {
+    if (treinosUsuario) {
+      setTreinos(treinosUsuario);
+      setTreinoSelecionado(treinosUsuario[0] ?? null);
+    }
+  }, [treinosUsuario]);
+
+  if (isTreinosLoading) {
+    return (
+      <Grid container justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
+        <CircularProgress />
+      </Grid>
+    );
+  }
 
   return (
     <Grid container spacing={3}>
@@ -30,91 +55,103 @@ export default function TreinoPage() {
         <Button variant="contained" sx={{ mb: 2 }}>
           Novo Treino
         </Button>
+
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
                 <TableCell>Profissional</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>Tempo</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {treinos.map((c) => (
-                <TableRow
-                  key={c.tipo}
-                  hover
-                  onClick={() => setTreinoSelecionado(c)}
-                  sx={{ cursor: "pointer" }}
-                >
-                  <TableCell>{c.data}</TableCell>
-                  <TableCell>{c.titulo}</TableCell>
-                  <TableCell>
-                    {c.tipo}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton color="primary">
-                      <Visibility />
-                    </IconButton>
-                    <IconButton color="secondary">
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="error">
-                      <Delete />
-                    </IconButton>
+              {treinos.length > 0 ? (
+                treinos.map((t) => (
+                  <TableRow
+                    key={t.id}
+                    hover
+                    onClick={() => setTreinoSelecionado(t)}
+                    selected={treinoSelecionado?.id === t.id}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <TableCell>{new Date(t.dataTreino).toLocaleString(
+                    'pt-BR',
+                    {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}</TableCell>
+                    <TableCell>{t.consulta?.profissionalSaude?.nome ?? "-"}</TableCell>
+                    <TableCell>{t.tempo ?? "-"}</TableCell>
+                    <TableCell align="right">
+                      <IconButton color="primary">
+                        <Visibility />
+                      </IconButton>
+                      <IconButton color="secondary">
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="error">
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    Nenhum treino encontrado.
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
       </Grid>
 
+      {/* Coluna de Detalhes */}
       <Grid size={{ xs: 12, md: 4 }}>
-        {treinoSelecionado && (
+        {treinoSelecionado ? (
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                {treinoSelecionado.titulo}
+                Detalhes do treino
               </Typography>
               <Typography>
-                {treinoSelecionado.data}, {
-                  treinoSelecionado.hora}
+                {treinoSelecionado.dataTreino}
               </Typography>
-              <Typography>
+
+              <Typography sx={{ mt: 2 }}>
                 <strong>Exercícios:</strong>
               </Typography>
-              <Typography>
-                {treinoSelecionado.exercicios.length > 0 ? (
-                  treinoSelecionado.exercicios.map((exercicio, index) => (
-                    <Card key={index} variant="outlined" sx={{ my: 1, p: 1 }}>
-                      <Typography variant="body2">
-                        <strong>{exercicio.nome}</strong>
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Séries: {exercicio.series}
-                      </Typography>
-                    </Card>
-                  ))
-                ) : (
-                  // Mensagem a ser exibida se não houver exercícios
-                  <Typography variant="body2" color="text.secondary">
-                    Nenhum exercício cadastrado.
-                  </Typography>
-                )}
-              </Typography>
-              <Typography>
-                <strong>Tipo:</strong> {treinoSelecionado.tipo}
-              </Typography>
-              <Typography>
-                <strong>Notas:</strong> {treinoSelecionado.notas}
-              </Typography>
+              {treinoSelecionado.treinoExercicios?.length > 0 ? (
+                treinoSelecionado.treinoExercicios.map((exercicio, index) => (
+                  <Card key={index} variant="outlined" sx={{ my: 1, p: 1 }}>
+                    <Typography variant="body2">
+                      <strong>{exercicio.nomeExercicio}</strong>
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Séries: {exercicio.series ?? "-"}
+                    </Typography>
+                  </Card>
+                ))
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Nenhum exercício cadastrado.
+                </Typography>
+              )}
             </CardContent>
           </Card>
+        ) : (
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            Selecione um treino para visualizar os detalhes.
+          </Typography>
         )}
       </Grid>
     </Grid>
-
   );
 }

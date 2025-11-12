@@ -5,18 +5,22 @@ import {
     Button,
     TextField,
     Grid,
-    IconButton
+    IconButton,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import type { Consulta } from '../../models/Consulta';
 import { useEffect, useState, type FC } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { atualizarConsulta, criarConsulta, type ConsultaRecordDto } from "../../services/consultaService";
+import { ExpandMore } from "@mui/icons-material";
 
 const initialFormData = {
     peso: 0,
     altura: 0,
-    dataConsulta: new Date().toISOString().substring(0, 16),
+    dataConsulta: '',
     numeroRefeicoes: 0,
     torax: 0,
     abdomen: 0,
@@ -49,7 +53,6 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 650,
     maxHeight: '80vh',
     maxWidth: '80vh',
     overflowY: 'auto',
@@ -96,7 +99,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
     const handleSave = async () => {
         const profissionalIdFallback = "00867429-1ecb-43c1-ae9b-e71083324498";
 
-        // 🟠 Validação inicial
         if (formData.peso <= 0 || formData.altura <= 0 || !formData.dataConsulta) {
             alert("Campos obrigatórios (Peso, Altura e Data) devem ser preenchidos e positivos.");
             return;
@@ -107,7 +109,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
             return;
         }
 
-        // 🟢 Converte data local para formato ISO (UTC)
         let dataConsultaISO = "";
         try {
             dataConsultaISO = new Date(formData.dataConsulta).toISOString();
@@ -116,7 +117,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
             return;
         }
 
-        // 🧹 Normaliza e sanitiza os dados
         const medidasPayload = {
             ...formData,
             peso: Number(formData.peso),
@@ -140,34 +140,35 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
         try {
             let finalPayload: Partial<ConsultaRecordDto>;
 
+            // 👇 Evita erro caso o campo esteja faltando
+            const profissionalSaudeId =
+                planoUsuario?.profissionalSaude?.id || profissionalIdFallback;
+
             if (isEditing) {
-                // 🔵 Atualização
                 if (!avaliacao?.id) {
                     throw new Error("Avaliação inválida para edição.");
                 }
 
                 const planoIdToUse =
-                    (avaliacao as any).plano?.id ||
-                    (avaliacao as any).planoId ||
+                    (avaliacao as any)?.plano?.id ||
+                    (avaliacao as any)?.planoId ||
                     planoUsuario?.id;
-
 
                 finalPayload = {
                     ...sanitizedPayload,
                     dataConsulta: dataConsultaISO,
                     planoId: planoIdToUse,
-                    profissionalSaudeId: planoUsuario.profissionalSaude.id || profissionalIdFallback,
+                    profissionalSaudeId,
                 };
 
                 console.log("Payload de atualização:", finalPayload);
                 await atualizarConsulta(avaliacao.id, finalPayload as ConsultaRecordDto);
             } else {
-                // 🟢 Criação
                 finalPayload = {
                     ...sanitizedPayload,
                     dataConsulta: dataConsultaISO,
                     planoId: planoUsuario!.id,
-                    profissionalSaudeId: planoUsuario!.profissionalSaude.id || profissionalIdFallback,
+                    profissionalSaudeId,
                 };
 
                 console.log("Payload de criação:", finalPayload);
@@ -181,7 +182,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
             alert("Falha ao salvar a avaliação. Verifique o console para mais detalhes.");
         }
     };
-
 
 
     return (
@@ -250,72 +250,86 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                         />
                     </Grid>
 
-                    {/* LINHA 2: Título Tronco */}
-                    <Grid size={{ xs: 12, md: 12 }}>
-                        <Typography variant="subtitle1">Medidas de Tronco (cm)</Typography>
-                    </Grid>
+                    <Accordion style={{ width: '100vh', marginBottom:"10px" }}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMore />}
+                            aria-controls="panel1-content"
+                            id="panel1-header"
+                        >
+                            <Typography component="span">Medidas corporais</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails style={{ width: '70vh', maxHeight:'40vh' ,alignItems:'center', overflow: 'auto'}}>
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, md: 12 }}>
+                                    <Typography variant="subtitle1">Medidas de Tronco (cm)</Typography>
+                                </Grid>
 
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <TextField
-                            fullWidth
-                            label="Pescoço "
-                            name="pescoco"
-                            type="number"
-                            value={formData.pescoco || ''}
-                            onChange={handleChange}
-                            size="small"
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <TextField fullWidth label="Tórax" name="torax" type="number" value={formData.torax || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <TextField fullWidth label="Cintura" name="cintura" type="number" value={formData.cintura || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField fullWidth label="Abdômen" name="abdomen" type="number" value={formData.abdomen || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
+                                <Grid size={{ xs: 12, md: 4 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Pescoço "
+                                        name="pescoco"
+                                        type="number"
+                                        value={formData.pescoco || ''}
+                                        onChange={handleChange}
+                                        size="small"
+                                    />
+                                </Grid>
 
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField fullWidth label="Quadril" name="quadril" type="number" value={formData.quadril || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
+                                <Grid size={{ xs: 12, md: 4 }}>
+                                    <TextField fullWidth label="Tórax" name="torax" type="number" value={formData.torax || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 4 }}>
+                                    <TextField fullWidth label="Cintura" name="cintura" type="number" value={formData.cintura || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
 
-                    <Grid size={{ xs: 12 }}>
-                        <Typography variant="subtitle1">Membros Superiores (cm)</Typography>
-                    </Grid>
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField fullWidth label="Abdômen" name="abdomen" type="number" value={formData.abdomen || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
 
-                    {/* LINHA 5: Braços e Antebraços */}
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField fullWidth label="Quadril" name="quadril" type="number" value={formData.quadril || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
 
-                    <Grid size={{ xs: 6, md: 6 }}>
-                        <TextField fullWidth label="Braço Esquerdo" name="bracoEsquerdo" type="number" value={formData.bracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 6, md: 6 }}>
-                        <TextField fullWidth label="Braço Direito" name="bracoDireito" type="number" value={formData.bracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 6, md: 6 }}>
-                        <TextField fullWidth label="Antebraço Esquerdo" name="antibracoEsquerdo" type="number" value={formData.antibracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 6, md: 6 }}>
-                        <TextField fullWidth label="Antebraço Direito" name="antibracoDireito" type="number" value={formData.antibracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
+                                <Grid size={{ xs: 12 }}>
+                                    <Typography variant="subtitle1">Membros Superiores (cm)</Typography>
+                                </Grid>
 
-                    <Grid size={{ xs: 12 }}>
-                        <Typography variant="subtitle1" >Membros Inferiores (cm)</Typography>
-                    </Grid>
 
-                    {/* LINHA 7: Coxas e Panturrilhas */}
-                    <Grid size={{ xs: 3 }}>
-                        <TextField fullWidth label="Coxa (E)" name="coxaEsquerda" type="number" value={formData.coxaEsquerda || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 3 }}>
-                        <TextField fullWidth label="Coxa (D)" name="coxaDireita" type="number" value={formData.coxaDireita || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 3 }}>
-                        <TextField fullWidth label="Panturrilha Direita" name="panturrilhaDireita" type="number" value={formData.panturrilhaDireita || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
-                    <Grid size={{ xs: 3 }}>
-                        <TextField fullWidth label="Panturrilha Esquerda" name="panturrilhaEsquerda" type="number" value={formData.panturrilhaEsquerda || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                    </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Braço Esquerdo" name="bracoEsquerdo" type="number" value={formData.bracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Braço Direito" name="bracoDireito" type="number" value={formData.bracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Antebraço Esquerdo" name="antibracoEsquerdo" type="number" value={formData.antibracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Antebraço Direito" name="antibracoDireito" type="number" value={formData.antibracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+
+                                <Grid size={{ xs: 12 }}>
+                                    <Typography variant="subtitle1" >Membros Inferiores (cm)</Typography>
+                                </Grid>
+
+                                {/* LINHA 7: Coxas e Panturrilhas */}
+                                <Grid size={{ xs: 3, md: 3 }}>
+                                    <TextField fullWidth label="Coxa (E)" name="coxaEsquerda" type="number" value={formData.coxaEsquerda || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 3 }}>
+                                    <TextField fullWidth label="Coxa (D)" name="coxaDireita" type="number" value={formData.coxaDireita || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 3 }}>
+                                    <TextField fullWidth label="Panturrilha Direita" name="panturrilhaDireita" type="number" value={formData.panturrilhaDireita || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                                <Grid size={{ xs: 3 }}>
+                                    <TextField fullWidth label="Panturrilha Esquerda" name="panturrilhaEsquerda" type="number" value={formData.panturrilhaEsquerda || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                </Grid>
+                            </Grid>
+                        </AccordionDetails>
+                    </Accordion>
+
 
                     {/* LINHA 8: Observações */}
                     <Grid size={{ xs: 12 }}>

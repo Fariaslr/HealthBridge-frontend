@@ -7,5 +7,5 @@ export interface Treino {
   consulta: Consulta;
   educadorFisico: string;
   treinoExercicios: ExecucaoExercicio[];
-  tempo: "CURTO_PRAZO" | "MEDIO_PRAZO" | "LONGO_PRAZO"; 
+  tempo: "TRINTA" | "SESSENTA" | "CENTO_VINTE"; 
 }

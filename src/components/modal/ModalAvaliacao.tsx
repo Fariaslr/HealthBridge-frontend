@@ -8,7 +8,7 @@ import {
     IconButton,
     Accordion,
     AccordionSummary,
-    AccordionDetails
+    AccordionDetails,
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import type { Consulta } from '../../models/Consulta';
@@ -139,8 +139,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
 
         try {
             let finalPayload: Partial<ConsultaRecordDto>;
-
-            // 👇 Evita erro caso o campo esteja faltando
             const profissionalSaudeId =
                 planoUsuario?.profissionalSaude?.id || profissionalIdFallback;
 
@@ -182,7 +180,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
             alert("Falha ao salvar a avaliação. Verifique o console para mais detalhes.");
         }
     };
-
 
     return (
         <Modal open={open} onClose={handleCloseAndClean}>
@@ -232,9 +229,6 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                             onChange={handleChange}
                             required
                             size="small"
-                            inputProps={{
-                                inputProps: { min: 0 }
-                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, md: 3 }}>
@@ -250,21 +244,17 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                         />
                     </Grid>
 
-                    <Accordion style={{ width: '100vh', marginBottom:"10px" }}>
+                    <Accordion style={{ width: '100vh', marginBottom: "10px" }}>
                         <AccordionSummary
                             expandIcon={<ExpandMore />}
                             aria-controls="panel1-content"
                             id="panel1-header"
                         >
-                            <Typography component="span">Medidas corporais</Typography>
+                            <Typography component="span">Medidas Tronco</Typography>
                         </AccordionSummary>
-                        <AccordionDetails style={{ width: '70vh', maxHeight:'40vh' ,alignItems:'center', overflow: 'auto'}}>
+                        <AccordionDetails style={{ width: '70vh', maxHeight: '40vh', alignItems: 'center', overflow: 'auto' }}>
                             <Grid container spacing={2}>
-                                <Grid size={{ xs: 12, md: 12 }}>
-                                    <Typography variant="subtitle1">Medidas de Tronco (cm)</Typography>
-                                </Grid>
-
-                                <Grid size={{ xs: 12, md: 4 }}>
+                                <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
                                         label="Pescoço "
@@ -276,62 +266,79 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                                     />
                                 </Grid>
 
-                                <Grid size={{ xs: 12, md: 4 }}>
-                                    <TextField fullWidth label="Tórax" name="torax" type="number" value={formData.torax || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                                </Grid>
-                                <Grid size={{ xs: 12, md: 4 }}>
-                                    <TextField fullWidth label="Cintura" name="cintura" type="number" value={formData.cintura || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField fullWidth label="Tórax" name="torax" type="number" value={formData.torax || ''} onChange={handleChange} size="small" />
                                 </Grid>
 
                                 <Grid size={{ xs: 12, md: 6 }}>
-                                    <TextField fullWidth label="Abdômen" name="abdomen" type="number" value={formData.abdomen || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                    <TextField fullWidth label="Abdômen" name="abdomen" type="number" value={formData.abdomen || ''} onChange={handleChange} size="small" />
                                 </Grid>
 
-                                <Grid size={{ xs: 12, md: 6 }}>
-                                    <TextField fullWidth label="Quadril" name="quadril" type="number" value={formData.quadril || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                                </Grid>
+                                {usuario?.sexo == 'MASCULINO' ? (
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <TextField fullWidth label="Cintura" name="cintura" type="number" value={formData.cintura || ''} onChange={handleChange} size="small" />
+                                    </Grid>) : (
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <TextField fullWidth label="Quadril" name="quadril" type="number" value={formData.quadril || ''} onChange={handleChange} size="small" />
+                                    </Grid>)
+                                }
+                            </Grid>
+                        </AccordionDetails>
+                    </Accordion>
 
-                                <Grid size={{ xs: 12 }}>
-                                    <Typography variant="subtitle1">Membros Superiores (cm)</Typography>
-                                </Grid>
+                    <Accordion style={{ width: '100vh', marginBottom: "10px" }}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMore />}
+                            aria-controls="panel1-content"
+                            id="panel1-header"
+                        >
+                            <Typography component="span">Medidas Superiores</Typography>
 
-
+                        </AccordionSummary>
+                        <AccordionDetails style={{ width: '70vh', maxHeight: '40vh', alignItems: 'center', overflow: 'auto' }}>
+                            <Grid container spacing={2}>
                                 <Grid size={{ xs: 6, md: 6 }}>
-                                    <TextField fullWidth label="Braço Esquerdo" name="bracoEsquerdo" type="number" value={formData.bracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                    <TextField fullWidth label="Braço (E)" name="bracoEsquerdo" type="number" value={formData.bracoEsquerdo || ''} onChange={handleChange} size="small" />
                                 </Grid>
                                 <Grid size={{ xs: 6, md: 6 }}>
-                                    <TextField fullWidth label="Braço Direito" name="bracoDireito" type="number" value={formData.bracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                    <TextField fullWidth label="Braço (D)" name="bracoDireito" type="number" value={formData.bracoDireito || ''} onChange={handleChange} size="small" />
                                 </Grid>
                                 <Grid size={{ xs: 6, md: 6 }}>
-                                    <TextField fullWidth label="Antebraço Esquerdo" name="antibracoEsquerdo" type="number" value={formData.antibracoEsquerdo || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                    <TextField fullWidth label="Antebraço (E)" name="antibracoEsquerdo" type="number" value={formData.antibracoEsquerdo || ''} onChange={handleChange} size="small" />
                                 </Grid>
                                 <Grid size={{ xs: 6, md: 6 }}>
-                                    <TextField fullWidth label="Antebraço Direito" name="antibracoDireito" type="number" value={formData.antibracoDireito || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                                </Grid>
-
-                                <Grid size={{ xs: 12 }}>
-                                    <Typography variant="subtitle1" >Membros Inferiores (cm)</Typography>
-                                </Grid>
-
-                                {/* LINHA 7: Coxas e Panturrilhas */}
-                                <Grid size={{ xs: 3, md: 3 }}>
-                                    <TextField fullWidth label="Coxa (E)" name="coxaEsquerda" type="number" value={formData.coxaEsquerda || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                                </Grid>
-                                <Grid size={{ xs: 3 }}>
-                                    <TextField fullWidth label="Coxa (D)" name="coxaDireita" type="number" value={formData.coxaDireita || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                                </Grid>
-                                <Grid size={{ xs: 3 }}>
-                                    <TextField fullWidth label="Panturrilha Direita" name="panturrilhaDireita" type="number" value={formData.panturrilhaDireita || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
-                                </Grid>
-                                <Grid size={{ xs: 3 }}>
-                                    <TextField fullWidth label="Panturrilha Esquerda" name="panturrilhaEsquerda" type="number" value={formData.panturrilhaEsquerda || ''} onChange={handleChange} size="small" /> {/* ✅ CORRIGIDO */}
+                                    <TextField fullWidth label="Antebraço (D)" name="antibracoDireito" type="number" value={formData.antibracoDireito || ''} onChange={handleChange} size="small" />
                                 </Grid>
                             </Grid>
                         </AccordionDetails>
                     </Accordion>
 
+                    <Accordion style={{ width: '100vh', marginBottom: "10px" }}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMore />}
+                            aria-controls="panel1-content"
+                            id="panel1-header"
+                        >
+                            <Typography component="span">Medidas Inferiores</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Coxa (E)" name="coxaEsquerda" type="number" value={formData.coxaEsquerda || ''} onChange={handleChange} size="small" />
+                                </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Coxa (D)" name="coxaDireita" type="number" value={formData.coxaDireita || ''} onChange={handleChange} size="small" />
+                                </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Panturrilha (E)" name="panturrilhaEsquerda" type="number" value={formData.panturrilhaEsquerda || ''} onChange={handleChange} size="small" />
+                                </Grid>
+                                <Grid size={{ xs: 6, md: 6 }}>
+                                    <TextField fullWidth label="Panturrilha (D)" name="panturrilhaDireita" type="number" value={formData.panturrilhaDireita || ''} onChange={handleChange} size="small" />
+                                </Grid>
+                            </Grid>
+                        </AccordionDetails>
+                    </Accordion>
 
-                    {/* LINHA 8: Observações */}
                     <Grid size={{ xs: 12 }}>
                         <TextField
                             fullWidth

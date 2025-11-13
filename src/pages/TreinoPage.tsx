@@ -61,8 +61,8 @@ export default function TreinoPage() {
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
-                <TableCell>Profissional</TableCell>
-                <TableCell>Tempo</TableCell>
+                <TableCell>Nome</TableCell>
+                <TableCell>Validade</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -86,8 +86,14 @@ export default function TreinoPage() {
                       minute: '2-digit',
                       second: '2-digit',
                     })}</TableCell>
-                    <TableCell>{t.consulta?.profissionalSaude?.nome ?? "-"}</TableCell>
-                    <TableCell>{t.tempo ?? "-"}</TableCell>
+                    <TableCell>{t.nome ?? "-"}</TableCell>
+                    <TableCell>{new Date(t.validadeProjeto).toLocaleString(
+                    'pt-BR',
+                    {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })}</TableCell>
                     <TableCell align="right">
                       <IconButton color="primary">
                         <Visibility />

@@ -38,15 +38,11 @@ export async function buscarConsultaPorId(id: string): Promise<Consulta> {
 }
 
 export async function criarConsulta(dto: ConsultaRecordDto): Promise<Consulta> {
-  console.log("Payload final JSON:", JSON.stringify(dto, null, 2));
-  alert("Payload final JSON:" + JSON.stringify(dto, null, 2));
   const response = await axios.post<Consulta>(`${API_BASE}/consultas`, dto);
   return response.data;
 }
 
 export async function atualizarConsulta(id: string, dto: ConsultaRecordDto): Promise<Consulta> {
-  console.log("Payload final JSON:", JSON.stringify(dto, null, 2));
-  alert("Payload final JSON:" + JSON.stringify(dto, null, 2));
   const response = await axios.put<Consulta>(`${API_BASE}/consultas/${id}`, dto);
   return response.data;
 }

@@ -78,10 +78,10 @@ export default function AvaliacaoPage() {
 
   const consultasOrdenadas = consultasUsuario
     ? [...consultasUsuario].sort((a, b) => {
-        const dataA = new Date(a.dataCriacao).getTime();
-        const dataB = new Date(b.dataCriacao).getTime();
-        
-        return dataB - dataA;
+      const dataA = new Date(a.dataCriacao).getTime();
+      const dataB = new Date(b.dataCriacao).getTime();
+
+      return dataB - dataA;
     })
     : null;
 
@@ -105,9 +105,12 @@ export default function AvaliacaoPage() {
             <TableHead>
               <TableRow>
                 <TableCell align="left">Data</TableCell>
-                <TableCell align="center">Peso</TableCell>
                 <TableCell align="center">Altura</TableCell>
+                <TableCell align="center">Peso</TableCell>                
                 <TableCell align="center">Calorias diárias</TableCell>
+                <TableCell align="center">Água</TableCell>
+                <TableCell align="center">Treino</TableCell>
+                <TableCell align="center">Dieta</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -130,9 +133,25 @@ export default function AvaliacaoPage() {
                       second: '2-digit',
                     }
                   )}</TableCell>
-                  <TableCell align="center">{c.peso} kg</TableCell>
                   <TableCell align="center">{c.altura} cm</TableCell>
+                  <TableCell align="center">{c.peso} kg</TableCell>                  
                   <TableCell align="center">{c.caloriasDiarias?.toFixed(0)} kcal</TableCell>
+                  <TableCell align="center">{c.aguaDiaria} ml</TableCell>
+                  <TableCell>
+                    {c.treino ? (
+                      <Button>
+                        Ver Treino
+                      </Button>
+                    ) : (
+                      <Button>
+                        Criar Treino
+                      </Button>
+                    )}
+                  </TableCell>
+
+                  <TableCell>
+                  </TableCell>
+
                   <TableCell align="right">
                     <IconButton color="primary">
                       <Visibility />
@@ -166,16 +185,16 @@ export default function AvaliacaoPage() {
               </Typography>
               <Typography>
                 <strong>Data e horário:</strong> {new Date(consultaSelecionada.dataCriacao).toLocaleString(
-                    'pt-BR',
-                    {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    }
-                  )}
+                  'pt-BR',
+                  {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  }
+                )}
               </Typography>
               <Typography>
 

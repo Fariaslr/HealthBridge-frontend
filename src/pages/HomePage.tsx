@@ -1,6 +1,5 @@
 import { useAuth } from "../context/AuthContext";
 import { Typography, Box } from "@mui/material";
-import { Outlet, } from "react-router-dom";
 
 export default function HomePage() {
     const { usuario } = useAuth();
@@ -15,12 +14,11 @@ export default function HomePage() {
             <Box
                 component="main"
                 sx={{
-                    flexGrow: 1, // Permite que o conteúdo ocupe o espaço restante
-                    p: 3, // Padding interno
-                    width: `calc(100% - 250px)`, // Ajuste dinâmico (250px é a largura da sidebar)
+                    flexGrow: 1, 
+                    p: 3, 
+                    width: `calc(100% - 250px)`,
                 }}
             >
-                {/* Título de Boas-vindas (Mantido no topo do conteúdo) */}
                 <Typography variant="h5" fontWeight="bold" sx={{ mb: 4 }}>
                     Olá, {usuario.nome}
                 </Typography>

@@ -40,10 +40,10 @@ const COLORS = ["#3b82f6", "#10b981", "#f97316"];
 export default function DashboardPage() {
   return (
     <Grid container spacing={3}>
-      <Grid size={{ xs: 6, md: 8 }}>
+      <Grid size={{ xs: 12, md: 12 }}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="subtitle2" color="text.secondary">
-            
+
             Próxima consulta
           </Typography>
           <Typography variant="h6">25 Maio, 10:00</Typography>
@@ -57,7 +57,7 @@ export default function DashboardPage() {
       </Grid>
 
       <Grid size={{ xs: 12, md: 4 }}>
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ p: 3 }}>
           <Typography variant="subtitle2" color="text.secondary">
             Treino de hoje
           </Typography>
@@ -68,9 +68,8 @@ export default function DashboardPage() {
         </Paper>
       </Grid>
 
-      {/* Plano atual */}
       <Grid size={{ xs: 12, md: 4 }}>
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ p: 3}}>
           <Typography variant="subtitle2" color="text.secondary">
             Plano atual
           </Typography>
@@ -158,7 +157,7 @@ export default function DashboardPage() {
 
       {/* Última consulta */}
       <Grid size={{ xs: 12, md: 4 }}>
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ p: 3 }}>
           <Typography variant="subtitle2" color="text.secondary">
             Última consulta
           </Typography>

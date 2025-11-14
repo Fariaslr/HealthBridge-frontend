@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import type { JSX } from "react";
-import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import CadastroPage from "./pages/CadastroPage.tsx";
 import AvaliacaoPage from "./pages/AvaliacaoPage.tsx";

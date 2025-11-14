@@ -35,8 +35,8 @@ export default function PerfilPage() {
     };
 
     const renderField = (title: string, value: string | number | null | undefined) => (
-        <Box mb={2}>
-            <Typography variant="subtitle2" color="text.secondary">{title}</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between" ,alignItems: "center", gap: 1, paddingBottom: 1}}>
+            <Typography variant="subtitle1" color="text.secondary">{title}</Typography>
             <Typography variant="body1" fontWeight="medium">
                 {value || 'Não informado'}
             </Typography>
@@ -65,22 +65,21 @@ export default function PerfilPage() {
                         <Divider sx={{ my: 1, mb: 1 }} />
 
                         <Grid container>
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12, md: 12 }}>
                                 {renderField("CPF", usuario.cpf)}
                             </Grid>
 
-                            <Grid size={{ xs: 12, md: 4 }}>
+                            <Grid size={{ xs: 12, md: 12 }}>
                                 {renderField("Nome Completo", `${usuario.nome} ${usuario.sobrenome}`)}
                             </Grid>
                         </Grid>
 
-                        <Divider sx={{ my: 1 }} />
 
                         <Grid container >
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12, md: 12 }}>
                                 {renderField("Data de Nascimento", formatDate(usuario.dataNascimento))} 
                             </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12, md: 12 }}>
                                 {renderField("Sexo", usuario.sexo)}
                             </Grid>
 
@@ -91,13 +90,11 @@ export default function PerfilPage() {
                             )}
                         </Grid>
 
-                        <Divider sx={{ my: 1 }} />
-
                         <Grid container spacing={0}>
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12, md: 12 }}>
                                 {renderField("E-mail", usuario.email)}
                             </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12, md: 12}}>
                                 {renderField("Telefone", usuario.telefone)}
                             </Grid>
                         </Grid>

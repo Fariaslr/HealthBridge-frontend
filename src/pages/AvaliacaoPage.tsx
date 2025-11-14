@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Button,
-  Card,
-  CardContent,
   Grid,
-  Typography,
   Table,
   TableBody,
   TableCell,
@@ -95,8 +92,8 @@ export default function AvaliacaoPage() {
   };
 
   return (
-    <Grid container spacing={3}>
-      <Grid size={{ xs: 12, md: 8 }}>
+    <Grid container spacing={1}>
+      <Grid size={{ xs: 12, md: 12 }}>
         <Button variant="contained" sx={{ mb: 2 }} onClick={handleOpen}>
           Nova Avaliação
         </Button>
@@ -176,36 +173,6 @@ export default function AvaliacaoPage() {
         </TableContainer>
       </Grid>
 
-      <Grid size={{ xs: 12, md: 4 }}>
-        {consultaSelecionada && (
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Detalhes da Consulta
-              </Typography>
-              <Typography>
-                <strong>Data e horário:</strong> {new Date(consultaSelecionada.dataCriacao).toLocaleString(
-                  'pt-BR',
-                  {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                  }
-                )}
-              </Typography>
-              <Typography>
-
-              </Typography>
-              <Typography>
-                <strong>Anotações:</strong> {consultaSelecionada.observacoes}
-              </Typography>
-            </CardContent>
-          </Card>
-        )}
-      </Grid>
       <AvaliacaoModalForm
         open={openAvaliacaoModal}
         onClose={handleClose}

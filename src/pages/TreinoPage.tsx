@@ -5,8 +5,6 @@ import {
 } from "@mui/icons-material";
 import {
   Button,
-  Card,
-  CardContent,
   Grid,
   IconButton,
   Paper,
@@ -16,12 +14,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { Treino } from "../models/Treino";
 import { useAuth } from "../context/AuthContext";
+import Sidebar from "../components/Sidebar";
 
 export default function TreinoPage() {
   const { treinosUsuario, carregarTreinos, isTreinosLoading } = useAuth();
@@ -50,8 +48,7 @@ export default function TreinoPage() {
 
   return (
     <Grid container spacing={3}>
-      {/* Coluna da Tabela */}
-      <Grid size={{ xs: 12, md: 8 }}>
+      <Grid size={{ xs: 12, md: 12 }}>
         <Button variant="contained" sx={{ mb: 2 }}>
           Novo Treino
         </Button>
@@ -117,46 +114,6 @@ export default function TreinoPage() {
             </TableBody>
           </Table>
         </TableContainer>
-      </Grid>
-
-      {/* Coluna de Detalhes */}
-      <Grid size={{ xs: 12, md: 4 }}>
-        {treinoSelecionado ? (
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Detalhes do treino
-              </Typography>
-              <Typography>
-                {treinoSelecionado.dataTreino}
-              </Typography>
-
-              <Typography sx={{ mt: 2 }}>
-                <strong>Exercícios:</strong>
-              </Typography>
-              {treinoSelecionado.treinoExercicios?.length > 0 ? (
-                treinoSelecionado.treinoExercicios.map((exercicio, index) => (
-                  <Card key={index} variant="outlined" sx={{ my: 1, p: 1 }}>
-                    <Typography variant="body2">
-                      <strong>{exercicio.nomeExercicio}</strong>
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Séries: {exercicio.series ?? "-"}
-                    </Typography>
-                  </Card>
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  Nenhum exercício cadastrado.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        ) : (
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Selecione um treino para visualizar os detalhes.
-          </Typography>
-        )}
       </Grid>
     </Grid>
   );

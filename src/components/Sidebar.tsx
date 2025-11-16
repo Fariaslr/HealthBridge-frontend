@@ -16,18 +16,16 @@ import {
     LocalDining,
     MedicalServices,
     AccountCircle,
-    Assignment,
     ExitToApp,
 } from "@mui/icons-material";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const SIDEBAR_WIDTH = 220;
+export const SIDEBAR_WIDTH = 220;
 
 const sidebarItems = [
     { name: "Dashboard", icon: <Dashboard />, path: "/home" },
-    { name: "Plano", icon: <Assignment />, path: "/plano" },
     { name: "Avaliações", icon: <MedicalServices />, path: "/avaliacao" },
     { name: "Treinos", icon: <FitnessCenter />, path: "/treino" },
     { name: "Dietas", icon: <LocalDining />, path: "/dieta" },
@@ -42,14 +40,18 @@ export default function Sidebar() {
     return (
         <Box
             sx={{
-                width: SIDEBAR_WIDTH,
-                flexShrink: 0,
-                bgcolor: "background.paper",
-                borderRight: "1px solid #e0e0e0",
-                height: "100vh",
-                display: "flex",
-                flexDirection: "column",
-            }}
+        width: SIDEBAR_WIDTH,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        height: "100vh",
+        bgcolor: "background.paper",
+        borderRight: "1px solid #e0e0e0",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
+    }}
         >
             <Box sx={{ textAlign: "center", mb: 2, paddingTop: 2 }}>
                 <img

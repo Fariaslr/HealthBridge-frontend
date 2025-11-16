@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import { PlanoModalForm } from "../components/modal/ModalPlano";
 import { deletarPlano } from "../services/planoService";
-import Sidebar from "../components/Sidebar";
 
 export default function PlanoPage() {
   const [openForm, setOpenForm] = useState(false);

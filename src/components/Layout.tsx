@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar, { SIDEBAR_WIDTH } from "./Sidebar";
 import { Box } from "@mui/material"; 
 
 export default function Layout() {
@@ -13,6 +13,7 @@ export default function Layout() {
         sx={{ 
           flexGrow: 1, 
           padding: 3, 
+           marginLeft: `${SIDEBAR_WIDTH}px`,
         }}
       >
         <Outlet />

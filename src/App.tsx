@@ -10,6 +10,7 @@ import PerfilPage from "./pages/PerfilPage.tsx";
 import TreinoPage from "./pages/TreinoPage.tsx";
 import DietaPage from "./pages/DietaPage.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
+import AvaliacaoDetalhePage from "./pages/AvaliacaoDetalhePage.tsx";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { usuario, isAuthReady } = useAuth();
@@ -36,12 +37,12 @@ function App() {
           }
         >
           <Route path="/home" element={<DashboardPage />} />
-          <Route path="/avaliacao" element={<AvaliacaoPage />}
-          />
+          <Route path="/avaliacao" element={<AvaliacaoPage />} />
+          <Route path="/avaliacao/:id" element={<AvaliacaoDetalhePage />} />
           <Route path="/plano" element={<PlanoPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
-          <Route path="/treino" element={<TreinoPage/>} />
-          <Route path="/dieta" element={<DietaPage/>} />
+          <Route path="/treino" element={<TreinoPage />} />
+          <Route path="/dieta" element={<DietaPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />

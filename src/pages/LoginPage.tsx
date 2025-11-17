@@ -17,7 +17,6 @@ export default function LoginPage() {
       const user = (await login(email, senha)) as Pessoa;
       setUsuario(user);
       setErro("");
-      alert(user.plano == null);
       navigate("/home");
     } catch (err: any) {
       setErro(err.message || "Erro ao fazer login");

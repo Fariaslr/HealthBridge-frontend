@@ -32,4 +32,5 @@ export interface Consulta {
     medidaCoxa?: string;
     caloriasDiarias?: number;
     aguaDiaria?: number;
+    taxaBasal?: number;
 }

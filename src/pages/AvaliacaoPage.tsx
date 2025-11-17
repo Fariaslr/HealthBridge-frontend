@@ -10,6 +10,7 @@ import type { Consulta } from "../models/Consulta";
 import { AvaliacaoModalForm } from "../components/modal/ModalAvaliacao";
 import { useAuth } from "../context/AuthContext";
 import { deletarConsulta } from "../services/consultaService";
+import { useNavigate } from "react-router-dom";
 
 export default function AvaliacaoPage() {
   const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(null);
@@ -17,6 +18,7 @@ export default function AvaliacaoPage() {
 
   const [openAvaliacaoModal, setOpenAvaliacaoModal] = useState(false);
   const [avaliacaoParaEditar, setAvaliacaoParaEditar] = useState<Consulta | null>(null);
+  const navigate = useNavigate(); 0
 
   const handleOpen = () => {
     setAvaliacaoParaEditar(null);
@@ -123,20 +125,14 @@ export default function AvaliacaoPage() {
                     <strong>Peso</strong>
                     <div>{c.peso} kg</div>
                   </Grid>
-
-                  <Grid size={{ xs: 6 }}>
-                    <strong>Calorias</strong>
-                    <div>{c.caloriasDiarias?.toFixed(0)} kcal</div>
-                  </Grid>
-
-                  <Grid size={{ xs: 6 }}>
-                    <strong>Água</strong>
-                    <div>{c.aguaDiaria} ml</div>
-                  </Grid>
-
+                  
                   <Grid size={{ xs: 12 }} style={{ marginTop: 12 }}>
-                    <Grid container justifyContent="space-between" style={{ marginTop: 8 }}>
-                      <IconButton color="primary">
+                    <Grid container justifyContent="space-between">
+                      <IconButton color="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/avaliacao/${c.id}`);
+                        }}>
                         <Visibility />
                       </IconButton>
                       <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleEdit(c); }}>

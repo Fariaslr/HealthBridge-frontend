@@ -98,7 +98,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                 }}
             >
                 <Avatar src={""} alt={usuario?.nome} />
-                <Typography variant="body2" noWrap sx={{ maxWidth: 120 }}>
+                <Typography variant="body2" noWrap sx={{ width: 120 }}>
                     {usuario?.nome}
                 </Typography>
                 <IconButton color="error" onClick={() => setUsuario(null)}>

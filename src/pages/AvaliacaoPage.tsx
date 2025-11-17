@@ -2,12 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Button,
   Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
   IconButton,
 } from "@mui/material";
@@ -97,80 +91,68 @@ export default function AvaliacaoPage() {
         <Button variant="contained" sx={{ mb: 2 }} onClick={handleOpen}>
           Nova Avaliação
         </Button>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align="left">Data</TableCell>
-                <TableCell align="center">Altura</TableCell>
-                <TableCell align="center">Peso</TableCell>                
-                <TableCell align="center">Calorias diárias</TableCell>
-                <TableCell align="center">Água</TableCell>
-                <TableCell align="center">Treino</TableCell>
-                <TableCell align="center">Dieta</TableCell>
-                <TableCell align="right">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {consultasOrdenadas?.map((c) => (
-                <TableRow
-                  key={c.id}
-                  hover
-                  onClick={() => setConsultaSelecionada(c)}
-                  sx={{ cursor: "pointer" }}
-                >
-                  <TableCell align="left">{new Date(c.dataCriacao).toLocaleString(
-                    'pt-BR',
-                    {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    }
-                  )}</TableCell>
-                  <TableCell align="center">{c.altura} cm</TableCell>
-                  <TableCell align="center">{c.peso} kg</TableCell>                  
-                  <TableCell align="center">{c.caloriasDiarias?.toFixed(0)} kcal</TableCell>
-                  <TableCell align="center">{c.aguaDiaria} ml</TableCell>
-                  <TableCell>
-                    {c.treino ? (
-                      <Button>
-                        Ver Treino
-                      </Button>
-                    ) : (
-                      <Button>
-                        Criar Treino
-                      </Button>
-                    )}
-                  </TableCell>
+        <Grid container spacing={3}>
 
-                  <TableCell>
-                  </TableCell>
+          {consultasOrdenadas?.map((c) => (
+            <Grid
+              key={c.id}
+              size={{ xs: 12, md: 6, lg: 4 }}
+            >
+              <Paper
+                elevation={3}
+                style={{
+                  padding: "16px",
+                  cursor: "pointer",
+                  borderRadius: "12px",
+                }}
+                onClick={() => setConsultaSelecionada(c)}
+              >
+                <Grid container spacing={1}>
 
-                  <TableCell align="right">
-                    <IconButton color="primary">
-                      <Visibility />
-                    </IconButton>
-                    <IconButton color="secondary" onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(c);
-                    }}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="error" onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(c.id);
-                    }}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  <Grid size={{ xs: 12 }}>
+                    <strong>Data:</strong><br />
+                    {new Date(c.dataCriacao).toLocaleString("pt-BR")}
+                  </Grid>
+
+                  <Grid size={{ xs: 6 }}>
+                    <strong>Altura</strong>
+                    <div>{c.altura} cm</div>
+                  </Grid>
+
+                  <Grid size={{ xs: 6 }}>
+                    <strong>Peso</strong>
+                    <div>{c.peso} kg</div>
+                  </Grid>
+
+                  <Grid size={{ xs: 6 }}>
+                    <strong>Calorias</strong>
+                    <div>{c.caloriasDiarias?.toFixed(0)} kcal</div>
+                  </Grid>
+
+                  <Grid size={{ xs: 6 }}>
+                    <strong>Água</strong>
+                    <div>{c.aguaDiaria} ml</div>
+                  </Grid>
+
+                  <Grid size={{ xs: 12 }} style={{ marginTop: 12 }}>
+                    <Grid container justifyContent="space-between" style={{ marginTop: 8 }}>
+                      <IconButton color="primary">
+                        <Visibility />
+                      </IconButton>
+                      <IconButton color="secondary" onClick={(e) => { e.stopPropagation(); handleEdit(c); }}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="error" onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}>
+                        <Delete />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+
+                </Grid>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
       </Grid>
 
       <AvaliacaoModalForm

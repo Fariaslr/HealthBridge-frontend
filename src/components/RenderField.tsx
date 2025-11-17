@@ -23,7 +23,7 @@ export default function FormField<FormType>({
             type={type}
             onChange={(e) => onChange(field, e.target.value)}
             size="small"
-            sx={{ mb: 2 }}
+            sx={{ mb: 1 }}
         />
     );
 }

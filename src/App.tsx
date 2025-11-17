@@ -11,6 +11,8 @@ import TreinoPage from "./pages/TreinoPage.tsx";
 import DietaPage from "./pages/DietaPage.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
 import AvaliacaoDetalhePage from "./pages/AvaliacaoDetalhePage.tsx";
+import TreinoCriarPage from "./pages/TreinoCriarPage.tsx";
+import { createTheme } from "@mui/material";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { usuario, isAuthReady } = useAuth();
@@ -21,6 +23,27 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
   }
   return usuario ? children : <Navigate to="/login" />;
 }
+
+const theme = createTheme({
+  palette: {
+    mode: "dark", // ativa o modo dark em tudo
+
+    background: {
+      default: "#101010",
+      paper: "#181818"
+    }
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#1e1e1e",
+          borderRadius: 12
+        }
+      }
+    }
+  }
+});
 
 function App() {
   return (
@@ -39,6 +62,7 @@ function App() {
           <Route path="/home" element={<DashboardPage />} />
           <Route path="/avaliacao" element={<AvaliacaoPage />} />
           <Route path="/avaliacao/:id" element={<AvaliacaoDetalhePage />} />
+          <Route path="/treino/novo/:consultaId" element={<TreinoCriarPage />} />
           <Route path="/plano" element={<PlanoPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/treino" element={<TreinoPage />} />

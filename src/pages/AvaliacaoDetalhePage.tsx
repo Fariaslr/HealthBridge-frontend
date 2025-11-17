@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { buscarConsultaPorId } from "../services/consultaService";
 import type { Consulta } from "../models/Consulta";
-import { Divider, IconButton } from "@mui/material";
+import { Button, Divider, IconButton } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 
 export default function AvaliacaoDetalhePage() {
@@ -14,7 +14,7 @@ export default function AvaliacaoDetalhePage() {
         async function carregarConsulta() {
             if (!id) return;
             try {
-                const consultaBuscada = await buscarConsultaPorId(id); // <-- await
+                const consultaBuscada = await buscarConsultaPorId(id);
                 setConsulta(consultaBuscada);
             } catch (error) {
                 console.error("Erro ao carregar consulta:", error);
@@ -34,14 +34,34 @@ export default function AvaliacaoDetalhePage() {
             >
                 <ArrowBack />
             </IconButton>
-            <Divider/>
+            <Divider />
             <h2>Avaliação de {new Date(consulta.dataCriacao).toLocaleDateString("pt-BR")}</h2>
 
             <p><b>Altura:</b> {consulta.altura} cm</p>
             <p><b>Peso:</b> {consulta.peso} kg</p>
-            <p><b>Taxa Metabolica Basal:</b> {consulta.taxaBasal?.toFixed(0) + " kcal"}</p>
             <p><b>Calorias diárias:</b> {consulta.caloriasDiarias?.toFixed(0) + " kcal"}</p>
             <p><b>Água:</b> {consulta.aguaDiaria} ml</p>
+            {consulta.plano == null
+                ? (
+                    <Button
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                        onClick={() => navigate(`/treino/${consulta.plano.id}`)}
+                    >
+                        Editar Treino
+                    </Button>
+                )
+                : (
+                    <Button
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                        onClick={() => navigate(`/treino/novo/${consulta.id}`)}
+                    >
+                        Criar Treino
+                    </Button>
+                )
+            }
+
 
         </div>
     );

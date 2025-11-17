@@ -4,4 +4,5 @@ export interface ExecucaoExercicio {
   series: number;
   repeticoes: number;
   carga?: number;
+  intervaloSerie: number;
 }

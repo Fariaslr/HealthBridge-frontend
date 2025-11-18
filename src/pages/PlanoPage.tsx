@@ -1,22 +1,31 @@
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Divider, FormControl, FormControlLabel, Grid, Paper, Radio, RadioGroup, Typography } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
-import { PlanoModalForm } from "../components/modal/ModalPlano";
-import { deletarPlano } from "../services/planoService";
+import { useEffect, useState } from "react";
+import { atualizarPlano } from "../services/planoService";
 
 export default function PlanoPage() {
-  const [openForm, setOpenForm] = useState(false);
-  const [openConfirm, setOpenConfirm] = useState(false);
 
-  const handleOpenForm = () => setOpenForm(true);
-  const handleCloseForm = () => setOpenForm(false);
+  const [formData, setFormData] = useState({
+    objetivo: '',
+    nivelAtividadeFisica: '',
+  });
 
-  const handleOpenConfirm = () => setOpenConfirm(true);
-  const handleCloseConfirm = () => setOpenConfirm(false);
+  const { usuario, planoUsuario, isPlanoLoading, setPlanoUsuario } = useAuth();
+  const planoExiste = !!usuario?.plano;
 
-  const { planoUsuario, isPlanoLoading, setPlanoUsuario } = useAuth();
-  const profissional = planoUsuario?.profissionalSaude;
-  const planoExiste = !!planoUsuario;
+  const OBJETIVOS_MAP = {
+    EMAGRECIMENTO: "Perder Peso",
+    MANUTENCAO: "Manter Peso",
+    HIPERTROFIA: "Ganho de Massa",
+  };
+
+  const NIVEIS_ATIVIDADE_MAP = {
+    SEDENTARIO: "Sedentário",
+    LEVEMENTE_ATIVO: "Levemente Ativo",
+    MODERADAMENTE_ATIVO: "Moderadamente Ativo",
+    ALTAMENTE_ATIVO: "Altamente Ativo",
+    EXTREMAMENTE_ATIVO: "Extremamente Ativo",
+  };
 
   if (isPlanoLoading) {
     return (
@@ -27,110 +36,101 @@ export default function PlanoPage() {
     );
   }
 
-  const handleDelete = async () => {
-    if (!planoUsuario || !planoUsuario.id) {
-      console.error("ID do plano ausente para exclusão.");
-      return;
+  useEffect(() => {
+    if (planoUsuario) {
+      setFormData({
+        objetivo: planoUsuario.objetivo || '',
+        nivelAtividadeFisica: planoUsuario.nivelAtividadeFisica || '',
+      });
     }
+  }, [planoUsuario]);
+
+
+const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+};
+
+  const handleSave = async () => {
+    if (!planoUsuario || !planoUsuario.id) return;
+
+    const updateDto = {
+      objetivo: formData.objetivo,
+      nivelAtividadeFisica: formData.nivelAtividadeFisica,
+    };
 
     try {
-      await deletarPlano(planoUsuario.id);
-
-      setPlanoUsuario(null);
-      handleCloseConfirm();
-      console.log(`Plano ID ${planoUsuario.id} excluído com sucesso!`);
+      const planoAtualizado = await atualizarPlano(planoUsuario.id, updateDto);
+      setPlanoUsuario(planoAtualizado);
+      alert("Plano atualizado com sucesso!");
 
     } catch (error) {
-      console.error("Erro ao deletar plano:", error);
-      handleCloseConfirm();
+      console.error("Falha ao salvar o plano:", error);
+      alert("Erro ao salvar o plano. Verifique os dados.");
     }
   };
 
   return (
-    <div>
-      {planoExiste ? (
-        <>
-          <p><b>Objetivo:</b> {planoUsuario.objetivo || 'Não definido'}</p>
-          <p><b>Nível de Atividade física:</b> {planoUsuario.nivelAtividadeFisica || 'Não definido'} </p>
-          <p>
-            <b>Profissional Responsável:</b>
-            {profissional?.nome ? `${profissional.nome} ${profissional.sobrenome || ''}`.trim() : 'Não atribuído'}
-          </p>
-          <p>
-            <b>Última alteração:</b>{" "}
-            {new Date(planoUsuario.dataAtualizacao).toLocaleString(
-              'pt-BR',
-              {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-              }
-            )}
-          </p>
+    <Paper sx={{ p: 3, maxWidth: 800, margin: 'auto', mt: 4 }}>
+      <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
+        Configuração do Plano
+      </Typography>
 
-          <p>
-            <b>Criação:</b>
-            {new Date(planoUsuario.dataCriacao).toLocaleString(
-              'pt-BR',
-              {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-              }
-            )}
-          </p>
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>1. Objetivo Principal</Typography>
+          <Divider sx={{ mb: 2 }} />
+          <FormControl component="fieldset" fullWidth>
+            <RadioGroup
+              name="objetivo"
+              value={formData.objetivo}
+              onChange={handleChange}
+            >
+              {Object.entries(OBJETIVOS_MAP).map(([key, label]) => (
+                <FormControlLabel
+                  key={key}
+                  value={key}
+                  control={<Radio color="primary" />}
+                  label={label}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </Grid>
 
-          <div style={{ marginTop: '20px' }}>
-            <Button variant="contained" color="primary" onClick={handleOpenForm}>Editar Plano</Button>
-            <Button variant="contained" color="secondary" style={{ marginLeft: "5px" }} onClick={handleOpenConfirm}>Excluir</Button>
-          </div>
-        </>
-      ) : (
-        <div>
-          <p>Parece que você ainda não possui um plano cadastrado.</p>
-          <Button variant="contained" color="primary" onClick={handleOpenForm}>Cadastrar Plano</Button>
-        </div>
-      )}
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="h6" sx={{ mb: 1, mt: 3 }}>2. Nível de Atividade Física</Typography>
+          <Divider sx={{ mb: 2 }} />
+          <FormControl component="fieldset" fullWidth>
+            <RadioGroup
+              name="nivelAtividadeFisica"
+              value={formData.nivelAtividadeFisica}
+              onChange={handleChange}
+            >
+              {Object.entries(NIVEIS_ATIVIDADE_MAP).map(([key, label]) => (
+                <FormControlLabel
+                  key={key}
+                  value={key}
+                  control={<Radio color="primary" />}
+                  label={label}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      </Grid>
 
-      <PlanoModalForm
-        open={openForm}
-        onClose={handleCloseForm}
-        plano={planoExiste ? planoUsuario : null}
-      />
-
-      <Dialog
-        open={openConfirm}
-        onClose={handleCloseConfirm}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Confirmar Exclusão"}</DialogTitle>
-        <DialogContent>
-          <Typography id="alert-dialog-description">
-            Tem certeza que deseja excluir permanentemente o plano atual? Esta ação é irreversível.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirm} color="primary">
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDelete}
-            color="error"
-            variant="contained"
-            autoFocus
-          >
-            Excluir Plano
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={!formData.objetivo || !formData.nivelAtividadeFisica}
+        >
+          Salvar Configurações
+        </Button>
+      </Box>
+    </Paper>
 
   );
 }

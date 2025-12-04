@@ -10,8 +10,7 @@ export default function PlanoPage() {
     nivelAtividadeFisica: '',
   });
 
-  const { usuario, planoUsuario, isPlanoLoading, setPlanoUsuario } = useAuth();
-  const planoExiste = !!usuario?.plano;
+  const { planoUsuario, isPlanoLoading, setPlanoUsuario } = useAuth();
 
   const OBJETIVOS_MAP = {
     EMAGRECIMENTO: "Perder Peso",

@@ -122,6 +122,7 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
             peso: Number(formData.peso),
             altura: Number(formData.altura),
             numeroRefeicoes: Number(formData.numeroRefeicoes),
+            dataConsulta: String(formData.dataConsulta)
         };
 
         const sanitizedPayload = Object.entries(medidasPayload).reduce(
@@ -206,7 +207,7 @@ export const AvaliacaoModalForm: FC<AvaliacaoModalFormProps> = ({ open, onClose,
                             fullWidth
                             label="Data da Consulta"
                             name="dataConsulta"
-                            type="datetime-local"
+                            type="date"
                             value={formData.dataConsulta}
                             onChange={handleChange}
                             required

@@ -21,7 +21,6 @@ export type PessoaUpdateDto = {
 
 
 export async function atualizarPessoa(id: string, dto: PessoaUpdateDto): Promise<AuthUser> {
-    const response = await axios.put<Pessoa>(`${API_BASE}/pessoas/${id}`, dto); 
-    
+    const response = await axios.put<Pessoa>(`${API_BASE}/pessoas/${id}`, dto);     
     return response.data;
 }
